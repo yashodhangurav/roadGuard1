@@ -90,8 +90,23 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
 
   return (
     <section id="top" className="relative pt-36 md:pt-44 overflow-clip">
+      {/* Ambient Unsplash Pothole Background with Visible Light Overlay */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
+        <img
+          src="https://images.unsplash.com/photo-1560782202-154b39d57ef2?auto=format&fit=crop&w=2400&q=85"
+          alt="Pothole Road Texture"
+          className="w-full h-full object-cover object-center opacity-70 filter brightness-125 contrast-120 scale-102"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/samples/road-pothole-1.jpg';
+          }}
+        />
+        {/* Balanced Light Overlay keeping pothole visible while ensuring crisp text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/35 to-[#07080b]/95" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber/25 via-transparent to-[#07080b]/70" />
+      </div>
+
       {/* Dual Radial Sky Glow matching Aloud .hero-sky */}
-      <div className="hero-sky pointer-events-none" aria-hidden="true" />
+      <div className="hero-sky pointer-events-none relative z-0" aria-hidden="true" />
 
       {/* Hero Copy Container */}
       <div className="wrap flex flex-col items-center text-center relative z-10">
@@ -114,18 +129,18 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: EASE_SWIFT }}
-          className="hero-title text-[clamp(28px,7.5vw,104px)] font-normal leading-[1.08] sm:leading-[0.98] tracking-[-0.03em] sm:tracking-[-0.058em] hero-title-gradient pb-2 max-w-5xl"
+          className="hero-title text-[clamp(28px,7.5vw,104px)] font-normal leading-[1.08] sm:leading-[0.98] tracking-[-0.03em] sm:tracking-[-0.058em] hero-title-gradient pb-2 max-w-5xl drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)]"
         >
           Intelligent Road<br className="sm:hidden" /> Monitoring.<br />
           Safer Roads.
         </motion.h1>
 
-        {/* Hero Lede */}
+        {/* Hero Lede with Frosted Scrim */}
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.65, delay: 0.15, ease: EASE_SWIFT }}
-          className="mt-4 sm:mt-7 max-w-[640px] text-text-2 text-[clamp(15px,1.6vw,20px)] leading-[1.55] tracking-[-0.01em] px-2 sm:px-0"
+          className="mt-4 sm:mt-7 max-w-[640px] text-white/90 text-[clamp(15px,1.6vw,20px)] leading-[1.55] tracking-[-0.01em] px-5 py-2.5 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 shadow-lg drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
         >
           AI-powered road damage detection that transforms road images and videos into actionable infrastructure intelligence.
         </motion.p>
@@ -148,7 +163,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
 
           <motion.button
             onClick={onOpenDemo}
-            className="btn btn-ghost btn-lg shadow-btn-ghost w-full sm:w-auto"
+            className="btn btn-ghost btn-lg shadow-btn-ghost w-full sm:w-auto bg-black/40 backdrop-blur-md"
             {...buttonMotion}
           >
             <Play className="w-3.5 h-3.5 fill-current text-text-2" />
@@ -162,7 +177,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.38 }}
-          className="flex flex-wrap justify-center items-center gap-x-2.5 gap-y-1 mt-6 text-text-3 font-mono text-[12.5px] tracking-wide"
+          className="flex flex-wrap justify-center items-center gap-x-2.5 gap-y-1 mt-6 text-neutral-300 font-mono text-[12.5px] tracking-wide px-4 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/10 shadow-lg"
         >
           <span>Edge Vision</span>
           <span className="text-text-4 select-none">·</span>

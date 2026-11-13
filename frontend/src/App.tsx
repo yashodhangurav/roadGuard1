@@ -52,7 +52,25 @@ const MainAppContent: React.FC = () => {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-screen bg-bg text-text antialiased selection:bg-amber selection:text-white flex flex-col">
+      <div className="min-h-screen bg-bg text-text antialiased selection:bg-amber selection:text-white flex flex-col relative">
+        {/* Ambient Unsplash Pothole Background with Visible Light Overlay */}
+        <div
+          className="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none"
+          aria-hidden="true"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1560782202-154b39d57ef2?auto=format&fit=crop&w=2400&q=85"
+            alt="Pothole Road Texture"
+            className="w-full h-full object-cover object-center opacity-55 filter brightness-125 contrast-115"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/samples/road-pothole-1.jpg';
+            }}
+          />
+          {/* Subtle Light Gradient Overlays for Readability & Depth */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#07080b]/70 via-[#07080b]/55 to-[#07080b]/85" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber/15 via-transparent to-[#07080b]/75" />
+        </div>
+
         {/* Auth Modal (Login / Signup) */}
         <AuthModal
           isOpen={isAuthOpen}
@@ -87,7 +105,7 @@ const MainAppContent: React.FC = () => {
             />
 
             {/* Main Page Sections in Strict Ordinal Reference Sequence */}
-            <main className="flex-1">
+            <main className="flex-1 relative z-10">
               <Hero onOpenDemo={() => setIsDemoOpen(true)} />
               <ProductPreview />
               <DetectionSection />
