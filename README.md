@@ -48,3 +48,4 @@ npm run preview
 - **02. Mapping:** Sub-meter GIS geocoding and spatial clustering along road corridors.
 - **03. Analysis:** Optical noise filtering (shadows, puddle glare) and ASTM D6433 Pavement Condition Index (PCI) scoring.
 - **04. Resolution:** Automated municipal work-order dispatch with asphalt tonnage estimations.
+

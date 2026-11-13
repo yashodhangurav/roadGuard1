@@ -102,6 +102,14 @@
     gap: 7px;
   }
 
+  .btn-note {
+    margin-left: 2px;
+    color: var(--text-3);
+    font-family: var(--mono);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+
   /* Keyboard Badges (<kbd>) */
   kbd {
     display: inline-flex;
@@ -149,16 +157,356 @@
     letter-spacing: 0.02em;
   }
 
-  /* Eyebrow Labels */
-  .eyebrow {
+  /* Navigation Bar Styles matching Aloud */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+  }
+
+  .nav-blur {
+    position: absolute;
+    inset: 0 0 -40px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .nav.is-scrolled .nav-blur {
+    opacity: 1;
+  }
+
+  .nav-blur::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(10, 10, 10, 0.82) 0%, rgba(10, 10, 10, 0.62) 40%, rgba(10, 10, 10, 0.22) 72%, rgba(10, 10, 10, 0) 100%);
+  }
+
+  .nav-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    height: 64px;
+    max-width: calc(var(--wrap) + var(--gutter) * 2);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+  }
+
+  .nav-links a {
+    padding: 6px 12px;
+    border-radius: 999px;
+    color: var(--text-2);
+    font-size: 14px;
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .nav-links a:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .nav-cta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 4px;
+  }
+
+  .nav-watch {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 20px;
-    color: var(--text-2);
-    font-family: 'Geist Mono', monospace;
+    gap: 7px;
+    height: 32px;
+    max-width: 0;
+    margin-right: -10px;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #111111;
+    box-shadow: inset 0 0 0 1px var(--line-2);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    opacity: 0;
+    transition: max-width 0.55s var(--ease), padding 0.55s var(--ease), margin 0.55s var(--ease), opacity 0.35s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+
+  .nav.is-past .nav-watch {
+    max-width: 180px;
+    margin-right: 0;
+    padding: 0 15px 0 13px;
+    opacity: 1;
+  }
+
+  .nav-watch:hover {
+    background: #181818;
+    box-shadow: inset 0 0 0 1px var(--line-3);
+  }
+
+  /* Hero Stage & Windows matching Aloud */
+  .hero-stage {
+    position: relative;
+    margin-top: 88px;
+    padding: 0 var(--gutter) 64px;
+  }
+
+  .hero-frame {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .hero-stage::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 120px;
+    background: linear-gradient(180deg, rgba(10, 10, 10, 0) 0%, var(--bg) 100%);
+    pointer-events: none;
+  }
+
+  .hero-glow {
+    position: absolute;
+    left: 50%;
+    top: 36%;
+    width: max(1800px, 150vw);
+    aspect-ratio: 16 / 9;
+    transform: translateX(-50%);
+    background: radial-gradient(circle at 50% 40%, rgba(217, 119, 87, 0.08) 0%, rgba(255, 255, 255, 0.03) 30%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-window {
+    z-index: 1;
+    width: 86%;
+    border-radius: 0.9975% / 1.3334%;
+    clip-path: inset(-120px -120px 22.2% -120px);
+    margin: 0 auto;
+    container-type: inline-size;
+    background: #111111;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.09),
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 40px 100px -20px rgba(0, 0, 0, 0.8),
+      0 80px 160px -40px rgba(0, 0, 0, 0.6);
+  }
+
+  .road-window {
+    position: relative;
+    z-index: 2;
+    width: 94%;
+    margin: -45.04% auto 0;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #000000;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.1),
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 -30px 80px -20px rgba(0, 0, 0, 0.7),
+      0 40px 100px -20px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Floating Telemetry Bar matching Aloud .bar */
+  .bar-dock {
+    position: sticky;
+    z-index: 5;
+    bottom: 28px;
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .bar-hero {
+    --u: 1.06px;
+    pointer-events: auto;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: calc(10 * var(--u));
+    width: calc(528 * var(--u));
+    max-width: calc(100vw - 32px);
+    height: calc(56 * var(--u));
+    padding: 0 calc(12 * var(--u));
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: calc(14 * var(--u));
+    background: #ffffff;
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.1),
+      0 4px 12px rgba(0, 0, 0, 0.16),
+      0 calc(30 * var(--u)) calc(80 * var(--u)) calc(-10 * var(--u)) rgba(0, 0, 0, 0.75);
+    color: #1a1a1a;
+    font-size: calc(13 * var(--u));
+    line-height: 1;
+    text-align: left;
+    transition: border-color 0.25s ease, background-color 0.25s ease;
+  }
+
+  .bar-hero:hover {
+    border-color: rgba(0, 0, 0, 0.16);
+    background: #fafafa;
+  }
+
+  .bar-key {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 6px;
+    background: #ffffff;
+  }
+
+  .bar-field {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    height: 18px;
+    color: #737373;
     font-size: 13px;
-    letter-spacing: 0.02em;
+    line-height: 18px;
+    white-space: nowrap;
+  }
+
+  .bar-ph,
+  .bar-try {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity 0.25s ease, filter 0.25s ease, transform 0.35s var(--ease);
+  }
+
+  .bar-try {
+    color: #1a1a1a;
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  .bar-hero:hover .bar-ph {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  .bar-hero:hover .bar-try {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .bar-meter {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-width: 40px;
+  }
+
+  .bar-bars {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    width: 28px;
+    height: 20px;
+  }
+
+  .bar-bars i {
+    display: block;
+    width: 3px;
+    border-radius: 1.5px;
+    background: #737373;
+    transition: height 0.15s ease;
+  }
+
+  .bar-clock {
+    color: #737373;
+    font-size: 11px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bar-chip {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 8px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 6px;
+    background: #ffffff;
+    font-size: 12px;
+    white-space: nowrap;
+    color: #1a1a1a;
+  }
+
+  .bar-caption {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 16px);
+    width: max-content;
+    max-width: min(640px, calc(100vw - 32px));
+    padding: 9px 16px;
+    border-radius: 12px;
+    background: rgba(10, 10, 10, 0.85);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    color: #ededed;
+    font-size: 16px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    text-align: center;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.35s ease, transform 0.5s var(--ease);
+  }
+
+  .bar-caption.is-on {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .bar-caption span {
+    opacity: 0.35;
+    transition: opacity 0.18s ease, color 0.18s ease;
+  }
+
+  .bar-caption span.is-said {
+    opacity: 1;
+    color: #ffffff;
+  }
+}
+
+/* Radar & Mic Ping Keyframes */
+@keyframes mic-ping {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  60%,
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
   }
 }
 
@@ -172,4 +520,3 @@
     animation-iteration-count: 1 !important;
   }
 }
-
