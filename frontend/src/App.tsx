@@ -9,6 +9,7 @@ import { Mapping } from './pages/Mapping';
 import { Analysis } from './pages/Analysis';
 import { Reports } from './pages/Reports';
 import { Analytics } from './pages/Analytics';
+import { AIAssistant } from './pages/AIAssistant';
 import { About } from './pages/About';
 import { CitizenLogin } from './pages/CitizenLogin';
 import { CitizenSignup } from './pages/CitizenSignup';
@@ -111,6 +112,14 @@ export const App: React.FC = () => {
               element={
                 <PageLayout>
                   <Analytics />
+                </PageLayout>
+              }
+            />
+            <Route
+              path="/ai-assistant"
+              element={
+                <PageLayout>
+                  <AIAssistant />
                 </PageLayout>
               }
             />

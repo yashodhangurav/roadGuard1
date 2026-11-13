@@ -1,51 +1,49 @@
-# RoadGuard AI — AI-Based Road Damage and Pothole Detection System
+# RoadSentinel AI
 
-> **Detect it. Map it. Fix it.**  
-> *Intelligent Road Monitoring. Safer Roads.*
+AI-powered road damage detection and maintenance platform for national-level smart infrastructure management.
 
-Transforming road images and videos into actionable infrastructure intelligence using AI-powered road damage and pothole detection.
+## Project Architecture
 
----
-
-## 📖 Project Documentation
-
-- **[DESIGN_TOKENS.md](./frontend/DESIGN_TOKENS.md)**: Extracted design system, colors, typography scales, container query mechanics, and motion easing tokens.
-- **[REFERENCE_ANALYSIS.md](./frontend/REFERENCE_ANALYSIS.md)**: Full reverse-engineering inspection report of the reference website architecture.
-- **[ROADGUARD_DESIGN_MAPPING.md](./frontend/ROADGUARD_DESIGN_MAPPING.md)**: Section-by-section product mapping specification for RoadGuard AI.
-
----
-
-## 🚀 Tech Stack
-
-- **Frontend:** React 18 + TypeScript + Vite 6
-- **Styling:** Tailwind CSS + Custom CSS Design Tokens
-- **Animations:** Framer Motion + Custom Spring Physics
-- **Icons:** Lucide React
-- **Visualization:** Recharts + Leaflet / React Leaflet
-
----
-
-## 🛠️ Getting Started
-
-```bash
-cd frontend
-npm install
-npm run dev
+```text
+RoadSentinel-AI/
+│
+├── frontend/                     # React + Vite + TypeScript + Tailwind CSS
+│   ├── src/
+│   │   ├── components/           # UI and domain components
+│   │   ├── pages/                # Dashboard, Detection, Mapping, Reports, Analytics
+│   │   ├── services/             # API client services
+│   │   ├── hooks/                # Custom React hooks
+│   │   └── assets/               # Static assets & icons
+│   └── package.json
+│
+├── backend/                      # Python + FastAPI + PyTorch + Ultralytics YOLO
+│   ├── app/
+│   │   ├── api/                  # API routers & endpoints
+│   │   ├── core/                 # Configuration & settings
+│   │   ├── models/               # Database ORM models
+│   │   ├── services/             # YOLO inference, severity engine & Ollama LLM
+│   │   ├── database/             # SQLite connection & session
+│   │   └── schemas/              # Pydantic request/response schemas
+│   ├── weights/                  # Pretrained YOLO checkpoints (.pt)
+│   ├── tests/                    # Pytest test suite
+│   ├── requirements.txt
+│   └── main.py
+│
+├── .gitignore
+└── README.md
 ```
 
-To build for production:
+## Detection Classes
 
-```bash
-npm run build
-npm run preview
-```
+- **D00** — Longitudinal Crack
+- **D10** — Transverse Crack
+- **D20** — Alligator Crack
+- **D40** — Pothole
+- **CHUNK_HOLE** — *(Architecturally planned; unsupported until fine-tuned checkpoint is trained)*
+- **WATER_FILLED_HOLE** — *(Architecturally planned; unsupported until fine-tuned checkpoint is trained)*
 
----
+## Prerequisites
 
-## 🏛️ Architecture Overview
-
-- **01. Detection:** Computer vision model identifying potholes, cracks, and road surface deterioration.
-- **02. Mapping:** Sub-meter GIS geocoding and spatial clustering along road corridors.
-- **03. Analysis:** Optical noise filtering (shadows, puddle glare) and ASTM D6433 Pavement Condition Index (PCI) scoring.
-- **04. Resolution:** Automated municipal work-order dispatch with asphalt tonnage estimations.
-
+- **Python**: 3.11+
+- **Node.js**: 18+ (tested on v24)
+- **Ollama**: Local instance running `gemma3:1b` on `http://localhost:11434`

@@ -251,4 +251,3 @@ export const CitizenSignup: React.FC = () => {
 };
 
 export default CitizenSignup;
-

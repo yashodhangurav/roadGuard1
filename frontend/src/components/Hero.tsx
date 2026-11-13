@@ -221,8 +221,9 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
                 {captionWords.map((word, idx) => (
                   <span
                     key={idx}
-                    className={`inline-block mr-1 transition-opacity ${idx < activeSpeechStep ? 'is-said text-white font-medium' : 'text-neutral-400 opacity-40'
-                      }`}
+                    className={`inline-block mr-1 transition-opacity ${
+                      idx < activeSpeechStep ? 'is-said text-white font-medium' : 'text-neutral-400 opacity-40'
+                    }`}
                   >
                     {word}
                   </span>

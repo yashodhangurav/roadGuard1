@@ -18,6 +18,7 @@ const PUBLIC_NAV_LINKS = [
   { label: 'Mapping', href: '/mapping' },
   { label: 'Analysis', href: '/analysis' },
   { label: 'Reports', href: '/reports' },
+  { label: 'AI Assistant', href: '/ai-assistant' },
   { label: 'About', href: '/about' },
 ];
 
