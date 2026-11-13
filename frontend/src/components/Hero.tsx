@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, Play, Radio, Layers } from 'lucide-react';
-import { RoadInspectionVisual } from './RoadInspectionVisual';
+import { Eye, Play, Radio } from 'lucide-react';
+import { RoadImageAnalysis } from './RoadImageAnalysis';
+import { DetectionResult } from '../services/detectionApi';
 import { useMagnetic } from '../hooks/useMagnetic';
 import { EASE_SWIFT, buttonMotion } from '../styles/motion';
 
@@ -12,14 +13,10 @@ interface HeroProps {
 export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
   const [isScanning, setIsScanning] = useState(false);
   const [activeSpeechStep, setActiveSpeechStep] = useState(0);
-
-  // Magnetic spring physics for floating pill bar
-  const { ref: magneticRef, offset } = useMagnetic<HTMLDivElement>({
-    strength: 0.16,
-    maxDistance: 16,
-  });
-
-  const captionWords = [
+  const [activeTelemetryText, setActiveTelemetryText] = useState(
+    'US-101 · Milepost 14.2 · Cavity Depth 82mm · 97.4% Conf'
+  );
+  const [captionWords, setCaptionWords] = useState<string[]>([
     'Severe',
     'pothole',
     'detected',
@@ -28,8 +25,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
     '14.2',
     '·',
     'Depth',
-    '7.2',
-    'cm',
+    '82mm',
     '·',
     'Logged',
     'to',
@@ -38,7 +34,43 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
     'Municipal',
     'Repair',
     'Queue',
-  ];
+  ]);
+
+  // Magnetic spring physics for floating pill bar
+  const { ref: magneticRef, offset } = useMagnetic<HTMLDivElement>({
+    strength: 0.16,
+    maxDistance: 16,
+  });
+
+  const handleAnalysisComplete = useCallback((result: DetectionResult) => {
+    if (result.defects.length > 0) {
+      const primary = result.defects[0];
+      const depthStr = primary.dimensions.estimatedDepthMm
+        ? `Depth ${primary.dimensions.estimatedDepthMm}mm`
+        : `${primary.dimensions.widthCm}×${primary.dimensions.heightCm}cm`;
+
+      setActiveTelemetryText(
+        `${result.fileName.replace(/\.jpg|\.png/i, '')} · ${primary.type} · ${depthStr} · ${primary.confidence}% Conf`
+      );
+
+      const words = [
+        primary.severity,
+        primary.type.toLowerCase(),
+        'detected',
+        '·',
+        `${primary.confidence}%`,
+        'confidence',
+        '·',
+        `${primary.dimensions.widthCm}x${primary.dimensions.heightCm}cm`,
+        ...(primary.dimensions.estimatedDepthMm ? ['·', `depth`, `${primary.dimensions.estimatedDepthMm}mm`] : []),
+        '·',
+        'Work',
+        'order:',
+        primary.urgency,
+      ];
+      setCaptionWords(words);
+    }
+  }, []);
 
   const handleSimulateScan = () => {
     if (isScanning) return;
@@ -48,12 +80,12 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
     captionWords.forEach((_, i) => {
       setTimeout(() => {
         setActiveSpeechStep(i + 1);
-      }, (i + 1) * 180);
+      }, (i + 1) * 160);
     });
 
     setTimeout(() => {
       setIsScanning(false);
-    }, 4500);
+    }, (captionWords.length + 2) * 160);
   };
 
   return (
@@ -130,7 +162,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
         </motion.p>
       </div>
 
-      {/* Hero Stage matching Aloud .hero-stage */}
+      {/* Hero Stage matching Aloud .hero-stage with Road Image Analysis Dashboard */}
       <div className="hero-stage" id="hero-stage">
         {/* Ambient Glow */}
         <div className="hero-glow" aria-hidden="true" />
@@ -139,60 +171,10 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
           initial={{ opacity: 0, y: 32, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.85, delay: 0.2, ease: EASE_SWIFT }}
-          className="hero-frame"
+          className="hero-frame px-3 sm:px-4"
         >
-          {/* Base Console Window (.hero-window) */}
-          <figure className="window hero-window">
-            {/* Top Window Strip */}
-            <div className="flex items-center justify-between h-9 px-4 border-b border-line bg-surface/90">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#333333]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#333333]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#333333]" />
-              </div>
-              <div className="font-mono text-xs text-text-3 flex items-center gap-2">
-                <Layers className="w-3.5 h-3.5 text-amber" />
-                <span>RoadGuard AI Infrastructure Console — Survey Corridor Overview</span>
-              </div>
-              <div className="text-[11px] font-mono text-text-4">14 defects logged</div>
-            </div>
-
-            {/* Base GIS Workspace Area */}
-            <div className="aspect-[1203/700] w-full bg-[#0d0e11] p-6 text-left">
-              <div className="grid grid-cols-4 gap-4 opacity-40">
-                <div className="p-3.5 rounded-xl border border-line bg-surface">
-                  <div className="text-xs font-mono text-text-3">CORRIDOR</div>
-                  <div className="text-sm font-semibold text-text mt-1">Route 101 North</div>
-                  <div className="text-xs text-amber font-mono mt-1">84.6 km surveyed</div>
-                </div>
-                <div className="p-3.5 rounded-xl border border-line bg-surface">
-                  <div className="text-xs font-mono text-text-3">POTHOLES</div>
-                  <div className="text-sm font-semibold text-text mt-1">14 Critical</div>
-                  <div className="text-xs text-text-3 font-mono mt-1">Avg Depth: 58mm</div>
-                </div>
-                <div className="p-3.5 rounded-xl border border-line bg-surface">
-                  <div className="text-xs font-mono text-text-3">PCI RATING</div>
-                  <div className="text-sm font-semibold text-text mt-1">58 / 100</div>
-                  <div className="text-xs text-amber font-mono mt-1">Tier 1 Maintenance</div>
-                </div>
-                <div className="p-3.5 rounded-xl border border-line bg-surface">
-                  <div className="text-xs font-mono text-text-3">STATUS</div>
-                  <div className="text-sm font-semibold text-emerald-400 mt-1">Live Processing</div>
-                  <div className="text-xs text-text-3 font-mono mt-1">RTK Lock: ±0.04m</div>
-                </div>
-              </div>
-            </div>
-          </figure>
-
-          {/* Overlapping Staging Road Inspection Window (.road-window) */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.85, delay: 0.35, ease: EASE_SWIFT }}
-            className="road-window"
-          >
-            <RoadInspectionVisual />
-          </motion.div>
+          {/* AI-Powered Road Image Analysis Interface */}
+          <RoadImageAnalysis onAnalysisComplete={handleAnalysisComplete} />
         </motion.div>
 
         {/* Floating Telemetry Speech Bubble & Pill Dock (.bar-dock) directly under .hero-stage matching Aloud */}
@@ -230,7 +212,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
             className="bar bar-hero cursor-pointer group"
             role="button"
             tabIndex={0}
-            aria-label="Simulate Road Defect Detection Telemetry"
+            aria-label="Inspect Road Defect Detection Telemetry"
           >
             {/* Radar / Microphone Key with Ping Animation */}
             <div className="bar-key">
@@ -242,9 +224,9 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
 
             {/* Interactive Status Field */}
             <div className="bar-field">
-              <span className="bar-ph hidden sm:inline">Click to simulate live road inspection</span>
-              <span className="bar-ph sm:hidden">Tap to simulate road scan</span>
-              <span className="bar-try">US-101 · Milepost 14.2 · Depth 72mm</span>
+              <span className="bar-ph hidden sm:inline">Telemetry Broadcast:</span>
+              <span className="bar-ph sm:hidden">Telemetry:</span>
+              <span className="bar-try text-neutral-800 font-mono text-[12px]">{activeTelemetryText}</span>
             </div>
 
             {/* Dynamic Sensor Telemetry Waveform Bars */}
@@ -266,7 +248,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
             {/* RTK Fixed Chip */}
             <div className="bar-chip hidden sm:flex">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-mono text-[11px]">RTK Fixed</span>
+              <span className="font-mono text-[11px]">RTK Lock ±4cm</span>
             </div>
           </div>
         </div>
