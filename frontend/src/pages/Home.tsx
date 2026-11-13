@@ -20,4 +20,3 @@ export const Home: React.FC<HomeProps> = ({ onOpenDemo }) => {
 };
 
 export default Home;
-

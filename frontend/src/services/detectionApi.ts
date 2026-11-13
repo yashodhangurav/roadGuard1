@@ -60,6 +60,7 @@ export interface DetectionResult {
   imageId: string;
   fileName: string;
   imageUrl: string;
+  annotatedImageUrl?: string;
   analyzedAt: string;
   defects: DetectedDefect[];
   stats: RoadDamageStats;
@@ -315,7 +316,7 @@ export async function analyzeRoadImage(
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
 
       const response = await fetch(customApiUrl, {
         method: 'POST',
@@ -327,12 +328,17 @@ export async function analyzeRoadImage(
       if (response.ok) {
         const data = await response.json();
         const duration = Math.round(performance.now() - startTime);
+        const backendOrigin = new URL(customApiUrl).origin;
+        const fullAnnotatedUrl = data.annotatedImageUrl 
+          ? (data.annotatedImageUrl.startsWith('http') ? data.annotatedImageUrl : `${backendOrigin}${data.annotatedImageUrl}`)
+          : undefined;
 
         return {
           imageId: data.imageId || `UPLOAD-${Date.now().toString(36).toUpperCase()}`,
           fileName: input.name,
           imageUrl: URL.createObjectURL(input),
-          analyzedAt: new Date().toISOString(),
+          annotatedImageUrl: fullAnnotatedUrl,
+          analyzedAt: data.analyzedAt || new Date().toISOString(),
           defects: data.defects || [],
           stats: data.stats || {
             totalDefects: data.defects?.length || 0,
@@ -349,14 +355,14 @@ export async function analyzeRoadImage(
           backend: 'Live API',
           backendEndpoint: customApiUrl,
           modelInfo: {
-            name: data.modelInfo?.name || 'YOLOv11-RoadDefect-RT',
-            version: data.modelInfo?.version || 'v4.2.0-live',
-            inferenceTimeMs: duration,
+            name: data.modelInfo?.name || 'YOLOv8s-RoadDamage-Edge',
+            version: data.modelInfo?.version || 'v1.0.0-verified',
+            inferenceTimeMs: data.modelInfo?.inferenceTimeMs || duration,
           },
         };
       }
-    } catch {
-      // Backend not running; fall through to realistic client-side analysis engine
+    } catch (err) {
+      console.warn("Backend API request error, falling back to simulated engine:", err);
     }
 
     // Fallback: Generate calibrated detection for custom uploaded file

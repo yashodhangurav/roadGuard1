@@ -233,19 +233,74 @@ export const ReportsProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [reports, setReports] = useState<RoadDamageReport[]>([]);
   const [filterStatus, setFilterStatus] = useState<string>('All');
 
-  // Load from localStorage or initialize with demo seed reports
+  // Load from localStorage and merge with live FastAPI backend database
   useEffect(() => {
+    let baseList = SEED_REPORTS;
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        setReports(JSON.parse(stored));
-      } else {
-        setReports(SEED_REPORTS);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_REPORTS));
+        baseList = JSON.parse(stored);
       }
     } catch {
-      setReports(SEED_REPORTS);
+      baseList = SEED_REPORTS;
     }
+    setReports(baseList);
+
+    // Fetch live reports from SQLite backend
+    const syncBackendReports = async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/api/reports');
+        if (res.ok) {
+          const backendList = await res.json();
+          if (Array.isArray(backendList) && backendList.length > 0) {
+            const mappedBackend: RoadDamageReport[] = backendList.map((br: any) => ({
+              id: br.id,
+              category: (br.potholes_count > 0 ? 'Pothole' : 'Longitudinal Crack') as DamageCategory,
+              severity: (br.overall_condition === 'Critical' ? 'Critical' : br.overall_condition === 'Poor' ? 'High' : 'Medium') as any,
+              description: `Autonomous YOLOv8 inspection report. Total defects detected: ${br.total_defects}. PCI Condition Rating: ${br.pci_score}/100. Patch requirement: ${br.estimated_patch_tons} tons.`,
+              imageUrl: br.annotated_image_url
+                ? (br.annotated_image_url.startsWith('http') ? br.annotated_image_url : `http://127.0.0.1:8000${br.annotated_image_url}`)
+                : '/samples/road-pothole-1.jpg',
+              location: {
+                latitude: br.latitude || 37.7749,
+                longitude: br.longitude || -122.4194,
+                address: br.location_name || 'Highway Route 101, MP 14.2',
+                isManualCorrection: false,
+                accuracyMeters: 2.5,
+              },
+              status: (br.overall_condition === 'Critical' ? 'In Progress' : 'Under Review') as ReportStatus,
+              submittedAt: br.analyzed_at ? new Date(br.analyzed_at).toLocaleDateString() : 'Today',
+              updatedAt: 'Live Synced',
+              citizenId: 'AUTONOMOUS-CV-SCANNER',
+              citizenName: 'RoadSentinel Edge Detector',
+              assignedCrew: 'Municipal Highway Maintenance Crew',
+              timeline: [
+                {
+                  status: 'Submitted' as ReportStatus,
+                  timestamp: br.analyzed_at ? new Date(br.analyzed_at).toLocaleTimeString() : 'Earlier',
+                  note: `Autonomous inspection completed with YOLOv8. Hazard Score: ${br.hazard_index}%.`,
+                }
+              ],
+            }));
+
+            // Merge avoiding ID duplication
+            setReports((prev) => {
+              const prevIds = new Set(prev.map((p) => p.id));
+              const newItems = mappedBackend.filter((mb) => !prevIds.has(mb.id));
+              const combined = [...newItems, ...prev];
+              try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(combined));
+              } catch {}
+              return combined;
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('Could not sync with live backend reports:', err);
+      }
+    };
+
+    syncBackendReports();
   }, []);
 
   const saveReports = (newReports: RoadDamageReport[]) => {

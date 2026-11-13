@@ -23,4 +23,3 @@ export const CitizenDashboardPage: React.FC = () => {
 };
 
 export default CitizenDashboardPage;
-
