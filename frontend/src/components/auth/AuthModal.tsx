@@ -552,8 +552,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </form>
           )}
 
+          {/* Municipal Administrator Portal Link */}
+          <div className="mt-4 pt-3.5 border-t border-white/10 text-center">
+            <a
+              href="/admin/login"
+              className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white transition group"
+            >
+              <Shield className="w-3.5 h-3.5 text-[#d97757]" />
+              <span>Municipal Infrastructure Authority?</span>
+              <span className="text-[#d97757] font-semibold group-hover:underline">Administrator Login →</span>
+            </a>
+          </div>
+
           {/* Footer note */}
-          <div className="mt-5 pt-3 border-t border-white/10 text-center text-[10px] text-neutral-500">
+          <div className="mt-3 pt-2 text-center text-[10px] text-neutral-500">
             Demo Mode: Credentials and session state are persisted locally in browser localStorage.
           </div>
         </motion.div>

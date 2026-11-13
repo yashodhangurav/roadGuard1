@@ -207,3 +207,4 @@ export const DISTRICT_DENSITY = [
   { district: 'Sunset District', reports: 16, avgResolutionDays: 3.1 },
   { district: 'Bayview / Hunters Point', reports: 12, avgResolutionDays: 2.2 },
 ];
+

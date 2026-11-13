@@ -252,3 +252,4 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({
     </div>
   );
 };
+

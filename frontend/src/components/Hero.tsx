@@ -95,6 +95,20 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
 
       {/* Hero Copy Container */}
       <div className="wrap flex flex-col items-center text-center relative z-10">
+        {/* Administrator Access Pill Banner */}
+        <motion.a
+          href="/admin/login"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: EASE_SWIFT }}
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-amber/35 bg-amber/10 hover:bg-amber/20 text-text-2 hover:text-white text-xs font-mono mb-6 transition shadow-sm group cursor-pointer"
+        >
+          <span className="w-2 h-2 rounded-full bg-amber animate-pulse" />
+          <span>Municipal Operations Terminal</span>
+          <span className="text-text-4 select-none">·</span>
+          <span className="text-amber font-semibold group-hover:underline">Administrator Login →</span>
+        </motion.a>
+
         {/* Fluid Hero Title */}
         <motion.h1
           initial={{ opacity: 0, y: 24 }}

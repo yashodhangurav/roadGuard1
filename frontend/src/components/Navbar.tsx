@@ -104,6 +104,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>View Live Demo</span>
           </button>
 
+          {/* Administrator Login Link (Always prominent) */}
+          <a
+            href="/admin/login"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-amber/40 bg-amber/10 hover:bg-amber/20 text-white text-xs font-semibold transition cursor-pointer shadow-sm"
+            title="Administrator / Municipal Authority Login"
+          >
+            <Shield className="w-3 h-3 text-amber" />
+            <span>Admin Login</span>
+          </a>
+
           {/* Citizen Auth Options (Desktop) */}
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
@@ -178,6 +188,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             transition={{ duration: 0.28, ease: EASE_SWIFT }}
             className="lg:hidden border-b border-line bg-surface/98 backdrop-blur-2xl px-6 py-5 space-y-4 shadow-2xl overflow-hidden"
           >
+            {/* Dedicated Administrator Access Card in Mobile Drawer */}
+            <a
+              href="/admin/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full py-2.5 px-3 rounded-xl border border-amber/40 bg-amber/15 hover:bg-amber/25 text-xs font-semibold text-white flex items-center justify-center gap-2 transition shadow-sm"
+            >
+              <Shield className="w-4 h-4 text-amber" />
+              <span>Administrator Login</span>
+            </a>
+
             {/* Citizen Status Banner on Mobile */}
             {isAuthenticated ? (
               <div className="p-3 rounded-xl bg-amber/10 border border-amber/30 flex items-center justify-between">

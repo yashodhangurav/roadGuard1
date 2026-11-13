@@ -70,3 +70,4 @@ export const StatusBadge: React.FC<{ status: ReportStatus | string; className?: 
     </span>
   );
 };
+

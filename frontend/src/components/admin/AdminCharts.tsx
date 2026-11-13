@@ -150,3 +150,4 @@ export const DistrictDensityChart: React.FC<{ height?: number }> = ({ height = 2
     </div>
   );
 };
+

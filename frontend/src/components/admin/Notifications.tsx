@@ -151,3 +151,4 @@ export const NotificationsDropdown: React.FC<NotificationsProps> = ({ onSelectRe
     </div>
   );
 };
+
