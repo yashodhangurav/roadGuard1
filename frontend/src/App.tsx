@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { X, Play } from 'lucide-react';
 import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
 import { Navbar } from './components/Navbar';
@@ -18,6 +19,10 @@ import { ReportsProvider } from './context/ReportsContext';
 import { AuthModal } from './components/auth/AuthModal';
 import { CitizenPortal } from './components/citizen/CitizenPortal';
 import { ReportIssueModal } from './components/citizen/ReportIssueModal';
+import { AdminLogin } from './pages/admin/AdminLogin';
+import { AdminPortal } from './pages/admin/AdminPortal';
+import { getStoredAdminUser } from './services/adminService';
+import { AdminUser } from './data/adminDemoData';
 import { modalBackdrop, modalFrame } from './styles/motion';
 
 const MainAppContent: React.FC = () => {
@@ -169,13 +174,63 @@ const MainAppContent: React.FC = () => {
   );
 };
 
+const AdminRouteWrapper: React.FC = () => {
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(() => getStoredAdminUser());
+  const navigate = useNavigate();
+
+  // Role-based protection: Citizens cannot access admin routes
+  if (!adminUser) {
+    return <Navigate to="/admin/login" replace />;
+  }
+
+  return (
+    <AdminPortal
+      adminUser={adminUser}
+      onLogout={() => {
+        setAdminUser(null);
+        navigate('/admin/login');
+      }}
+      onBackToHome={() => {
+        navigate('/');
+      }}
+    />
+  );
+};
+
+const AdminLoginWrapper: React.FC = () => {
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(() => getStoredAdminUser());
+  const navigate = useNavigate();
+
+  // If already authenticated as administrator, redirect to dashboard
+  if (adminUser) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  return (
+    <AdminLogin
+      onLoginSuccess={(user) => {
+        setAdminUser(user);
+        navigate('/admin/dashboard');
+      }}
+      onBackToHome={() => navigate('/')}
+    />
+  );
+};
+
 export const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <ReportsProvider>
-        <MainAppContent />
-      </ReportsProvider>
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <ReportsProvider>
+          <Routes>
+            <Route path="/admin/login" element={<AdminLoginWrapper />} />
+            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="/admin/*" element={<AdminRouteWrapper />} />
+            <Route path="*" element={<MainAppContent />} />
+          </Routes>
+        </ReportsProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 };
 

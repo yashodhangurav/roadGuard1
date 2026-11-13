@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { updateReportStatus as adminUpdateReportStatus } from '../services/adminService';
 
 export type ReportStatus =
   | 'Submitted'
@@ -63,6 +64,12 @@ interface ReportsContextType {
   filteredReports: RoadDamageReport[];
   createReport: (data: CreateReportData, citizenName: string, citizenId: string) => Promise<RoadDamageReport>;
   getReportById: (id: string) => RoadDamageReport | undefined;
+  updateReportStatus: (
+    id: string,
+    newStatus: ReportStatus,
+    notes?: string,
+    rejectionReason?: string
+  ) => RoadDamageReport | null;
   stats: {
     total: number;
     submitted: number;
@@ -295,6 +302,19 @@ export const ReportsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return reports.find((r) => r.id === id);
   };
 
+  const updateReportStatus = (
+    id: string,
+    newStatus: ReportStatus,
+    notes?: string,
+    rejectionReason?: string
+  ): RoadDamageReport | null => {
+    const updated = adminUpdateReportStatus(id, newStatus, notes, rejectionReason);
+    if (updated) {
+      setReports((prev) => prev.map((r) => (r.id === id ? updated : r)));
+    }
+    return updated;
+  };
+
   const resetToSampleReports = () => {
     saveReports(SEED_REPORTS);
   };
@@ -322,6 +342,7 @@ export const ReportsProvider: React.FC<{ children: React.ReactNode }> = ({ child
         filteredReports,
         createReport,
         getReportById,
+        updateReportStatus,
         stats,
         resetToSampleReports,
       }}
@@ -338,3 +359,4 @@ export const useReports = () => {
   }
   return context;
 };
+

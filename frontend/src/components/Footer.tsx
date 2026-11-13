@@ -12,7 +12,7 @@ export const Footer: React.FC = () => {
       className="pt-24 pb-12 mt-36 border-t border-line text-left text-sm text-text-2"
     >
       <div className="wrap">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-10 lg:gap-8 pb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1fr_1fr_1fr] gap-8 pb-16">
           {/* Brand Column */}
           <div className="space-y-4 pr-4">
             <div className="flex items-center gap-2.5">
@@ -83,6 +83,35 @@ export const Footer: React.FC = () => {
               <li><a href="#privacy" className="hover:text-text transition-colors">On-Device Privacy Blurring</a></li>
               <li><a href="#faq" className="hover:text-text transition-colors">Pavement Condition Index (PCI)</a></li>
               <li><a href="#download" className="hover:text-text transition-colors">Engine Version v4.2.0</a></li>
+            </ul>
+          </div>
+
+          {/* Administration Column */}
+          <div className="space-y-3">
+            <h5 className="font-medium text-xs font-mono uppercase tracking-wider text-text">Administration</h5>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <a
+                  href="/admin/login"
+                  className="hover:text-amber transition-colors flex items-center gap-1.5 text-text-2 font-medium"
+                >
+                  <Shield className="w-3.5 h-3.5 text-amber" />
+                  <span>Administrator Portal</span>
+                </a>
+              </li>
+              <li>
+                <a href="/admin/login" className="hover:text-text transition-colors">
+                  Supervisor Access
+                </a>
+              </li>
+              <li>
+                <a href="/admin/dashboard" className="hover:text-text transition-colors">
+                  Municipal Command
+                </a>
+              </li>
+              <li>
+                <span className="text-text-4 font-mono text-[11px]">Restricted DPW Terminal</span>
+              </li>
             </ul>
           </div>
         </div>

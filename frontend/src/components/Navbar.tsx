@@ -18,6 +18,7 @@ const DESKTOP_NAV_LINKS = [
   { label: 'Mapping', href: '#mapping' },
   { label: 'Analysis', href: '#analysis' },
   { label: 'FAQ', href: '#faq' },
+  { label: 'Admin', href: '/admin/login' },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -231,6 +232,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {link.label}
                 </a>
               ))}
+              <a
+                href="/admin/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-base text-amber hover:text-amber font-medium py-1 transition-colors flex items-center gap-1.5"
+              >
+                <Shield className="w-4 h-4 text-amber" />
+                <span>Administrator Portal</span>
+              </a>
             </nav>
 
             <div className="pt-3 border-t border-line flex flex-col gap-2.5">
