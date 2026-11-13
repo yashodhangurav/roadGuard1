@@ -13,44 +13,92 @@ import { PrivacySection } from './components/PrivacySection';
 import { FAQ } from './components/FAQ';
 import { BottomCTA } from './components/BottomCTA';
 import { Footer } from './components/Footer';
+import { AuthProvider } from './context/AuthContext';
+import { ReportsProvider } from './context/ReportsContext';
+import { AuthModal } from './components/auth/AuthModal';
+import { CitizenPortal } from './components/citizen/CitizenPortal';
+import { ReportIssueModal } from './components/citizen/ReportIssueModal';
 import { modalBackdrop, modalFrame } from './styles/motion';
 
-export const App: React.FC = () => {
+const MainAppContent: React.FC = () => {
+  const [currentView, setCurrentView] = useState<'home' | 'portal'>('home');
   const [isDemoOpen, setIsDemoOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
-  // Keyboard accessibility: Escape key closes modal
+  // Keyboard accessibility: Escape key closes modals
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isDemoOpen) {
-        setIsDemoOpen(false);
+      if (e.key === 'Escape') {
+        if (isDemoOpen) setIsDemoOpen(false);
+        if (isAuthOpen) setIsAuthOpen(false);
+        if (isReportModalOpen) setIsReportModalOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isDemoOpen]);
+  }, [isDemoOpen, isAuthOpen, isReportModalOpen]);
+
+  const handleOpenAuth = (mode: 'login' | 'signup') => {
+    setAuthMode(mode);
+    setIsAuthOpen(true);
+  };
 
   return (
     <MotionConfig reducedMotion="user">
       <div className="min-h-screen bg-bg text-text antialiased selection:bg-amber selection:text-white flex flex-col">
-        {/* Fixed Sticky Header */}
-        <Navbar onOpenDemo={() => setIsDemoOpen(true)} />
+        {/* Auth Modal (Login / Signup) */}
+        <AuthModal
+          isOpen={isAuthOpen}
+          initialMode={authMode}
+          onClose={() => setIsAuthOpen(false)}
+          onSuccess={() => {
+            setIsAuthOpen(false);
+            setCurrentView('portal');
+          }}
+        />
 
-        {/* Main Page Sections in Strict Ordinal Reference Sequence */}
-        <main className="flex-1">
-          <Hero onOpenDemo={() => setIsDemoOpen(true)} />
-          <ProductPreview />
-          <DetectionSection />
-          <MappingSection />
-          <AnalysisSection />
-          <ResolutionSection />
-          <BentoDetails />
-          <PrivacySection />
-          <FAQ />
-          <BottomCTA onOpenDemo={() => setIsDemoOpen(true)} />
-        </main>
+        {/* Global Report Road Issue Modal */}
+        <ReportIssueModal
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+          onSuccessRedirect={() => {
+            setCurrentView('portal');
+          }}
+        />
 
-        {/* Global Footer */}
-        <Footer />
+        {/* VIEW CONDITIONAL: Either Citizen Portal OR Public Homepage */}
+        {currentView === 'portal' ? (
+          <CitizenPortal onBackToHome={() => setCurrentView('home')} />
+        ) : (
+          <>
+            {/* Fixed Sticky Header */}
+            <Navbar
+              onOpenDemo={() => setIsDemoOpen(true)}
+              onOpenAuth={handleOpenAuth}
+              onOpenPortal={() => setCurrentView('portal')}
+              onOpenReportModal={() => setIsReportModalOpen(true)}
+            />
+
+            {/* Main Page Sections in Strict Ordinal Reference Sequence */}
+            <main className="flex-1">
+              <Hero onOpenDemo={() => setIsDemoOpen(true)} />
+              <ProductPreview />
+              <DetectionSection />
+              <MappingSection />
+              <AnalysisSection />
+              <ResolutionSection />
+              <BentoDetails />
+              <PrivacySection />
+              <FAQ />
+              <BottomCTA onOpenDemo={() => setIsDemoOpen(true)} />
+            </main>
+
+            {/* Global Footer */}
+            <Footer />
+          </>
+        )}
 
         {/* Interactive Video Demo Modal matching Aloud's <dialog id="film"> with Framer Motion */}
         <AnimatePresence>
@@ -118,6 +166,16 @@ export const App: React.FC = () => {
         </AnimatePresence>
       </div>
     </MotionConfig>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <ReportsProvider>
+        <MainAppContent />
+      </ReportsProvider>
+    </AuthProvider>
   );
 };
 

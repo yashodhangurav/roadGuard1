@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Play, Eye, Menu, X } from 'lucide-react';
+import { Shield, Play, Eye, Menu, X, User, Plus, LogOut } from 'lucide-react';
 import { NAV_LINKS } from '../data/roadguardData';
 import { useScrollPosition } from '../hooks/useScrollPosition';
+import { useAuth } from '../context/AuthContext';
 import { EASE_SWIFT, buttonMotion } from '../styles/motion';
 
 interface NavbarProps {
   onOpenDemo?: () => void;
+  onOpenAuth?: (mode: 'login' | 'signup') => void;
+  onOpenPortal?: () => void;
+  onOpenReportModal?: () => void;
 }
 
 const DESKTOP_NAV_LINKS = [
@@ -16,8 +20,14 @@ const DESKTOP_NAV_LINKS = [
   { label: 'FAQ', href: '#faq' },
 ];
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenDemo }) => {
+export const Navbar: React.FC<NavbarProps> = ({
+  onOpenDemo,
+  onOpenAuth,
+  onOpenPortal,
+  onOpenReportModal,
+}) => {
   const { isScrolled } = useScrollPosition();
+  const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -67,7 +77,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDemo }) => {
         </motion.a>
 
         {/* Desktop Navigation Links */}
-        <nav className="nav-links hidden md:flex">
+        <nav className="nav-links hidden lg:flex">
           {DESKTOP_NAV_LINKS.map((link) => (
             <motion.a
               key={link.href}
@@ -86,12 +96,53 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDemo }) => {
           {/* Scroll-Revealed "View Live Demo" Button (.nav-watch) */}
           <button
             onClick={onOpenDemo}
-            className="nav-watch hidden sm:inline-flex"
+            className="nav-watch hidden xl:inline-flex"
             aria-label="View Live Demo"
           >
             <Play className="w-3 h-3 fill-current text-text-2" />
             <span>View Live Demo</span>
           </button>
+
+          {/* Citizen Auth Options (Desktop) */}
+          {isAuthenticated ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onOpenPortal}
+                className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber/40 bg-amber/10 hover:bg-amber/20 text-white text-xs font-semibold transition cursor-pointer"
+                title="Open Citizen Road Incident Portal"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Portal ({user?.name.split(' ')[0]})</span>
+              </button>
+
+              <button
+                onClick={onOpenReportModal}
+                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber hover:bg-[#c66848] text-white text-xs font-semibold transition cursor-pointer shadow-[0_0_15px_rgba(217,119,87,0.3)]"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Report Issue</span>
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => onOpenAuth?.('login')}
+                className="text-xs font-semibold text-neutral-300 hover:text-white px-3 py-1.5 rounded-full transition hover:bg-white/5 cursor-pointer"
+              >
+                Log In
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onOpenAuth?.('signup')}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-line-2 bg-surface hover:bg-surface-2 text-text text-xs font-semibold transition cursor-pointer shadow-sm"
+              >
+                <User className="w-3 h-3 text-amber" />
+                <span>Sign Up</span>
+              </button>
+            </div>
+          )}
 
           {/* Primary CTA */}
           <motion.a
@@ -107,7 +158,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDemo }) => {
           {/* Mobile Hamburger Button */}
           <motion.button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden flex items-center justify-center w-8 h-8 rounded-full border border-line-2 bg-surface text-text hover:bg-surface-2 transition-colors shrink-0"
+            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-full border border-line-2 bg-surface text-text hover:bg-surface-2 transition-colors shrink-0 cursor-pointer"
             aria-label="Toggle Navigation Menu"
             whileTap={{ scale: 0.9 }}
           >
@@ -124,9 +175,52 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDemo }) => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.28, ease: EASE_SWIFT }}
-            className="md:hidden border-b border-line bg-surface/98 backdrop-blur-2xl px-6 py-5 space-y-4 shadow-2xl overflow-hidden"
+            className="lg:hidden border-b border-line bg-surface/98 backdrop-blur-2xl px-6 py-5 space-y-4 shadow-2xl overflow-hidden"
           >
-            <nav className="flex flex-col space-y-2.5">
+            {/* Citizen Status Banner on Mobile */}
+            {isAuthenticated ? (
+              <div className="p-3 rounded-xl bg-amber/10 border border-amber/30 flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-bold text-white">{user?.name}</div>
+                  <div className="text-[10px] text-neutral-400 font-mono">
+                    Citizen Reporter
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    logout();
+                  }}
+                  className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1"
+                >
+                  <LogOut className="w-3 h-3" />
+                  <span>Log Out</span>
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenAuth?.('login');
+                  }}
+                  className="py-2 px-3 rounded-xl border border-line-2 bg-surface text-xs font-semibold text-text text-center"
+                >
+                  Log In
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenAuth?.('signup');
+                  }}
+                  className="py-2 px-3 rounded-xl bg-amber text-xs font-semibold text-white text-center shadow-sm"
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
+
+            <nav className="flex flex-col space-y-2.5 pt-2">
               {NAV_LINKS.map((link) => (
                 <a
                   key={link.href}
@@ -140,24 +234,40 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDemo }) => {
             </nav>
 
             <div className="pt-3 border-t border-line flex flex-col gap-2.5">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenDemo?.();
-                }}
-                className="btn btn-ghost w-full justify-center"
-              >
-                <Play className="w-3.5 h-3.5 fill-current text-text-2" />
-                <span>View Live Demo</span>
-              </button>
-              <a
-                href="#detection"
-                onClick={() => setMobileMenuOpen(false)}
-                className="btn btn-light w-full justify-center shadow-btn-light"
-              >
-                <Eye className="w-4 h-4" />
-                <span>Explore Detection</span>
-              </a>
+              {isAuthenticated ? (
+                <>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onOpenPortal?.();
+                    }}
+                    className="btn btn-light w-full justify-center shadow-btn-light"
+                  >
+                    <span>Open Citizen Portal</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onOpenReportModal?.();
+                    }}
+                    className="btn btn-ghost w-full justify-center"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-amber" />
+                    <span>Report Road Issue</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenDemo?.();
+                  }}
+                  className="btn btn-ghost w-full justify-center"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current text-text-2" />
+                  <span>View Live Demo</span>
+                </button>
+              )}
             </div>
           </motion.div>
         )}
