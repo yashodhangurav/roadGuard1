@@ -544,3 +544,21 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Leaflet Map Dark Styling */
+.dark-tiles .leaflet-tile {
+  filter: brightness(0.65) invert(1) contrast(2.8) hue-rotate(200deg) saturate(0.25) brightness(0.75);
+}
+
+.dark-popup .leaflet-popup-content-wrapper {
+  background: #111219 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7) !important;
+  color: #ededed !important;
+}
+
+.dark-popup .leaflet-popup-tip {
+  background: #111219 !important;
+}
+

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Play, Eye, Menu, X, User, Plus, LogOut } from 'lucide-react';
-import { NAV_LINKS } from '../data/roadguardData';
+import { Shield, Play, Menu, X, Plus, LogOut, ArrowRight } from 'lucide-react';
 import { useScrollPosition } from '../hooks/useScrollPosition';
 import { useAuth } from '../context/AuthContext';
 import { EASE_SWIFT, buttonMotion } from '../styles/motion';
@@ -9,27 +9,37 @@ import { EASE_SWIFT, buttonMotion } from '../styles/motion';
 interface NavbarProps {
   onOpenDemo?: () => void;
   onOpenAuth?: (mode: 'login' | 'signup') => void;
-  onOpenPortal?: () => void;
   onOpenReportModal?: () => void;
 }
 
-const DESKTOP_NAV_LINKS = [
-  { label: 'Detection', href: '#detection' },
-  { label: 'Mapping', href: '#mapping' },
-  { label: 'Analysis', href: '#analysis' },
-  { label: 'FAQ', href: '#faq' },
-  { label: 'Admin', href: '/admin/login' },
+const PUBLIC_NAV_LINKS = [
+  { label: 'Home', href: '/' },
+  { label: 'Detection', href: '/detection' },
+  { label: 'Mapping', href: '/mapping' },
+  { label: 'Analysis', href: '/analysis' },
+  { label: 'Reports', href: '/reports' },
+  { label: 'About', href: '/about' },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenDemo,
   onOpenAuth,
-  onOpenPortal,
   onOpenReportModal,
 }) => {
   const { isScrolled } = useScrollPosition();
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    } else if (onOpenAuth) {
+      onOpenAuth('signup');
+    } else {
+      navigate('/signup');
+    }
+  };
 
   return (
     <header
@@ -62,12 +72,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       <div className="nav-inner">
         {/* Brand Logo */}
-        <motion.a
-          href="#"
+        <Link
+          to="/"
           className="flex items-center gap-2.5 group"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.18, ease: EASE_SWIFT }}
         >
           <div className="w-8 h-8 rounded-lg bg-surface-2 border border-line-2 flex items-center justify-center text-text shadow-sm group-hover:border-line-3 transition-colors">
             <Shield className="w-4 h-4 text-amber" />
@@ -75,96 +82,95 @@ export const Navbar: React.FC<NavbarProps> = ({
           <span className="font-semibold text-[15px] tracking-tight text-text">
             ROADGUARD <span className="text-amber font-bold">AI</span>
           </span>
-        </motion.a>
+        </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="nav-links hidden lg:flex">
-          {DESKTOP_NAV_LINKS.map((link) => (
-            <motion.a
+        <nav className="nav-links hidden lg:flex items-center gap-6">
+          {PUBLIC_NAV_LINKS.map((link) => (
+            <NavLink
               key={link.href}
-              href={link.href}
-              className="text-sm text-text-2 hover:text-text transition-colors relative"
-              whileHover={{ y: -1 }}
-              transition={{ duration: 0.15 }}
+              to={link.href}
+              className={({ isActive }) =>
+                `text-sm font-medium transition-colors relative py-1 ${
+                  isActive
+                    ? 'text-white font-semibold'
+                    : 'text-text-2 hover:text-text'
+                }`
+              }
             >
-              {link.label}
-            </motion.a>
+              {({ isActive }) => (
+                <>
+                  <span>{link.label}</span>
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-active-pill"
+                      className="absolute -bottom-1 left-0 right-0 h-[2px] bg-amber rounded-full"
+                      transition={{ duration: 0.2 }}
+                    />
+                  )}
+                </>
+              )}
+            </NavLink>
           ))}
         </nav>
 
-        {/* Nav CTAs & Mobile Toggle */}
-        <div className="nav-cta flex items-center gap-2">
-          {/* Scroll-Revealed "View Live Demo" Button (.nav-watch) */}
-          <button
-            onClick={onOpenDemo}
-            className="nav-watch hidden xl:inline-flex"
-            aria-label="View Live Demo"
-          >
-            <Play className="w-3 h-3 fill-current text-text-2" />
-            <span>View Live Demo</span>
-          </button>
-
-          {/* Administrator Login Link (Always prominent) */}
-          <a
-            href="/admin/login"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-amber/40 bg-amber/10 hover:bg-amber/20 text-white text-xs font-semibold transition cursor-pointer shadow-sm"
-            title="Administrator / Municipal Authority Login"
-          >
-            <Shield className="w-3 h-3 text-amber" />
-            <span>Admin Login</span>
-          </a>
+        {/* Nav CTAs */}
+        <div className="nav-cta flex items-center gap-2.5">
+          {/* Live Demo Trigger */}
+          {onOpenDemo && (
+            <button
+              onClick={onOpenDemo}
+              className="nav-watch hidden xl:inline-flex items-center gap-1.5 text-xs text-text-2 hover:text-white transition px-2.5 py-1.5 rounded-full hover:bg-white/5"
+              aria-label="View Live Demo"
+            >
+              <Play className="w-3 h-3 fill-current text-amber" />
+              <span>Live Demo</span>
+            </button>
+          )}
 
           {/* Citizen Auth Options (Desktop) */}
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
-              <button
-                onClick={onOpenPortal}
+              <Link
+                to="/dashboard"
                 className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber/40 bg-amber/10 hover:bg-amber/20 text-white text-xs font-semibold transition cursor-pointer"
-                title="Open Citizen Road Incident Portal"
+                title="Open Citizen Dashboard"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Portal ({user?.name.split(' ')[0]})</span>
-              </button>
+                <span>Dashboard ({user?.name.split(' ')[0]})</span>
+              </Link>
 
-              <button
-                onClick={onOpenReportModal}
-                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber hover:bg-[#c66848] text-white text-xs font-semibold transition cursor-pointer shadow-[0_0_15px_rgba(217,119,87,0.3)]"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Report Issue</span>
-              </button>
+              {onOpenReportModal && (
+                <button
+                  onClick={onOpenReportModal}
+                  className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber hover:bg-[#c66848] text-white text-xs font-semibold transition cursor-pointer shadow-[0_0_15px_rgba(217,119,87,0.3)]"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Report</span>
+                </button>
+              )}
             </div>
           ) : (
-            <div className="flex items-center gap-1.5">
+            <div className="hidden sm:flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => onOpenAuth?.('login')}
-                className="text-xs font-semibold text-neutral-300 hover:text-white px-3 py-1.5 rounded-full transition hover:bg-white/5 cursor-pointer"
+                onClick={() => (onOpenAuth ? onOpenAuth('login') : navigate('/login'))}
+                className="text-xs font-semibold text-text-2 hover:text-white px-3 py-1.5 rounded-full transition hover:bg-white/5 cursor-pointer"
               >
                 Log In
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onOpenAuth?.('signup')}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-line-2 bg-surface hover:bg-surface-2 text-text text-xs font-semibold transition cursor-pointer shadow-sm"
-              >
-                <User className="w-3 h-3 text-amber" />
-                <span>Sign Up</span>
               </button>
             </div>
           )}
 
-          {/* Primary CTA */}
-          <motion.a
-            href="#detection"
+          {/* Prominent "Get Started" Primary CTA */}
+          <motion.button
+            onClick={handleGetStarted}
             className="btn btn-light btn-sm shadow-btn-light"
             {...buttonMotion}
           >
-            <Eye className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Explore Detection</span>
-            <span className="sm:hidden">Explore</span>
-          </motion.a>
+            <span>{isAuthenticated ? 'My Dashboard' : 'Get Started'}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </motion.button>
 
           {/* Mobile Hamburger Button */}
           <motion.button
@@ -178,7 +184,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* Mobile Navigation Dropdown Drawer with Framer Motion AnimatePresence */}
+      {/* Mobile Navigation Dropdown Drawer */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -188,17 +194,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             transition={{ duration: 0.28, ease: EASE_SWIFT }}
             className="lg:hidden border-b border-line bg-surface/98 backdrop-blur-2xl px-6 py-5 space-y-4 shadow-2xl overflow-hidden"
           >
-            {/* Dedicated Administrator Access Card in Mobile Drawer */}
-            <a
-              href="/admin/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full py-2.5 px-3 rounded-xl border border-amber/40 bg-amber/15 hover:bg-amber/25 text-xs font-semibold text-white flex items-center justify-center gap-2 transition shadow-sm"
-            >
-              <Shield className="w-4 h-4 text-amber" />
-              <span>Administrator Login</span>
-            </a>
-
-            {/* Citizen Status Banner on Mobile */}
+            {/* Citizen Status / Actions on Mobile */}
             {isAuthenticated ? (
               <div className="p-3 rounded-xl bg-amber/10 border border-amber/30 flex items-center justify-between">
                 <div>
@@ -223,7 +219,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    onOpenAuth?.('login');
+                    if (onOpenAuth) onOpenAuth('login');
+                    else navigate('/login');
                   }}
                   className="py-2 px-3 rounded-xl border border-line-2 bg-surface text-xs font-semibold text-text text-center"
                 >
@@ -232,7 +229,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    onOpenAuth?.('signup');
+                    if (onOpenAuth) onOpenAuth('signup');
+                    else navigate('/signup');
                   }}
                   className="py-2 px-3 rounded-xl bg-amber text-xs font-semibold text-white text-center shadow-sm"
                 >
@@ -241,62 +239,60 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
-            <nav className="flex flex-col space-y-2.5 pt-2">
-              {NAV_LINKS.map((link) => (
-                <a
+            {/* Navigation links */}
+            <nav className="flex flex-col space-y-2 pt-2">
+              {PUBLIC_NAV_LINKS.map((link) => (
+                <NavLink
                   key={link.href}
-                  href={link.href}
+                  to={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-base text-text-2 hover:text-text font-medium py-1 transition-colors"
+                  className={({ isActive }) =>
+                    `text-base font-medium py-1.5 px-2 rounded-lg transition-colors flex items-center justify-between ${
+                      isActive
+                        ? 'text-amber bg-white/[0.04] font-semibold'
+                        : 'text-text-2 hover:text-white'
+                    }`
+                  }
                 >
-                  {link.label}
-                </a>
+                  <span>{link.label}</span>
+                </NavLink>
               ))}
-              <a
-                href="/admin/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-base text-amber hover:text-amber font-medium py-1 transition-colors flex items-center gap-1.5"
-              >
-                <Shield className="w-4 h-4 text-amber" />
-                <span>Administrator Portal</span>
-              </a>
             </nav>
 
             <div className="pt-3 border-t border-line flex flex-col gap-2.5">
-              {isAuthenticated ? (
-                <>
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      onOpenPortal?.();
-                    }}
-                    className="btn btn-light w-full justify-center shadow-btn-light"
-                  >
-                    <span>Open Citizen Portal</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      onOpenReportModal?.();
-                    }}
-                    className="btn btn-ghost w-full justify-center"
-                  >
-                    <Plus className="w-3.5 h-3.5 text-amber" />
-                    <span>Report Road Issue</span>
-                  </button>
-                </>
-              ) : (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleGetStarted();
+                }}
+                className="btn btn-light w-full justify-center shadow-btn-light"
+              >
+                <span>{isAuthenticated ? 'Open Dashboard' : 'Get Started Free'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              {onOpenReportModal && isAuthenticated && (
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    onOpenDemo?.();
+                    onOpenReportModal();
                   }}
                   className="btn btn-ghost w-full justify-center"
                 >
-                  <Play className="w-3.5 h-3.5 fill-current text-text-2" />
-                  <span>View Live Demo</span>
+                  <Plus className="w-3.5 h-3.5 text-amber" />
+                  <span>Report Road Issue</span>
                 </button>
               )}
+
+              {/* Subtle Administrator Portal Link */}
+              <Link
+                to="/admin/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-2 px-3 rounded-lg border border-line bg-white/[0.02] hover:bg-white/[0.06] text-xs font-mono text-text-3 hover:text-white flex items-center justify-center gap-2 transition"
+              >
+                <Shield className="w-3.5 h-3.5 text-amber" />
+                <span>Municipal Administrator Access</span>
+              </Link>
             </div>
           </motion.div>
         )}

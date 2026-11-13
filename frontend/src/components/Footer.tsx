@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Shield, Github, ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -9,20 +10,20 @@ export const Footer: React.FC = () => {
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '-5% 0px' }}
       transition={{ duration: 0.6 }}
-      className="pt-24 pb-12 mt-36 border-t border-line text-left text-sm text-text-2"
+      className="pt-20 pb-12 mt-28 border-t border-line text-left text-sm text-text-2 relative z-10"
     >
       <div className="wrap">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1fr_1fr_1fr] gap-8 pb-16">
           {/* Brand Column */}
           <div className="space-y-4 pr-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-surface-2 border border-line-2 flex items-center justify-center text-text shadow-sm">
+            <Link to="/" className="flex items-center gap-2.5 group">
+              <div className="w-8 h-8 rounded-lg bg-surface-2 border border-line-2 flex items-center justify-center text-text shadow-sm group-hover:border-line-3 transition-colors">
                 <Shield className="w-4 h-4 text-amber" />
               </div>
               <span className="font-semibold text-base tracking-tight text-text">
                 ROADGUARD <span className="text-amber font-bold">AI</span>
               </span>
-            </div>
+            </Link>
             <p className="text-xs text-text-3 max-w-xs leading-relaxed">
               Intelligent Road Monitoring. Safer Roads. Automated computer vision and infrastructure telemetry for resilient transportation networks.
             </p>
@@ -36,22 +37,22 @@ export const Footer: React.FC = () => {
           <div className="space-y-3">
             <h5 className="font-medium text-xs font-mono uppercase tracking-wider text-text">Platform</h5>
             <ul className="space-y-2 text-xs">
-              <li><a href="#demo" className="hover:text-text transition-colors">Interactive Demo</a></li>
-              <li><a href="#detection" className="hover:text-text transition-colors">01 Detect it</a></li>
-              <li><a href="#mapping" className="hover:text-text transition-colors">02 Map it</a></li>
-              <li><a href="#analysis" className="hover:text-text transition-colors">03 Analyse it</a></li>
-              <li><a href="#resolution" className="hover:text-text transition-colors">04 Resolve it</a></li>
+              <li><Link to="/detection" className="hover:text-text transition-colors">01 Detection Workspace</Link></li>
+              <li><Link to="/mapping" className="hover:text-text transition-colors">02 GIS Damage Map</Link></li>
+              <li><Link to="/analysis" className="hover:text-text transition-colors">03 Pavement Analysis</Link></li>
+              <li><Link to="/reports" className="hover:text-text transition-colors">04 Citizen Reports</Link></li>
+              <li><Link to="/analytics" className="hover:text-text transition-colors">05 Municipal Telemetry</Link></li>
             </ul>
           </div>
 
-          {/* Solutions Column */}
+          {/* Solutions & Info Column */}
           <div className="space-y-3">
             <h5 className="font-medium text-xs font-mono uppercase tracking-wider text-text">Solutions</h5>
             <ul className="space-y-2 text-xs">
-              <li><a href="#demo" className="hover:text-text transition-colors">Municipal Public Works</a></li>
-              <li><a href="#mapping" className="hover:text-text transition-colors">State DOT Corridors</a></li>
-              <li><a href="#details" className="hover:text-text transition-colors">Fleet Telematics Operators</a></li>
-              <li><a href="#privacy" className="hover:text-text transition-colors">Data Sovereignty</a></li>
+              <li><Link to="/about" className="hover:text-text transition-colors">About RoadGuard</Link></li>
+              <li><Link to="/mapping" className="hover:text-text transition-colors">Corridor Monitoring</Link></li>
+              <li><Link to="/reports" className="hover:text-text transition-colors">Public Works Dispatch</Link></li>
+              <li><Link to="/about#privacy" className="hover:text-text transition-colors">Data Sovereignty</Link></li>
               <li>
                 <a
                   href="mailto:civil@roadguard.ai"
@@ -70,7 +71,7 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2 text-xs">
               <li>
                 <a
-                  href="https://github.com/yashodhangurav/roadguard"
+                  href="https://github.com/yashodhan/roadguard"
                   target="_blank"
                   rel="noreferrer"
                   className="hover:text-text transition-colors flex items-center gap-1.5"
@@ -79,10 +80,10 @@ export const Footer: React.FC = () => {
                   <span>GitHub Repository</span>
                 </a>
               </li>
-              <li><a href="#details" className="hover:text-text transition-colors">Jetson & Edge NPU Specs</a></li>
-              <li><a href="#privacy" className="hover:text-text transition-colors">On-Device Privacy Blurring</a></li>
-              <li><a href="#faq" className="hover:text-text transition-colors">Pavement Condition Index (PCI)</a></li>
-              <li><a href="#download" className="hover:text-text transition-colors">Engine Version v4.2.0</a></li>
+              <li><Link to="/analysis" className="hover:text-text transition-colors">YOLOv11 Edge Vision</Link></li>
+              <li><Link to="/about" className="hover:text-text transition-colors">ASTM D6433 PCI Metric</Link></li>
+              <li><Link to="/about" className="hover:text-text transition-colors">Edge Privacy Blurring</Link></li>
+              <li><span className="text-text-4 font-mono text-[11px]">Engine v4.2.0</span></li>
             </ul>
           </div>
 
@@ -91,26 +92,26 @@ export const Footer: React.FC = () => {
             <h5 className="font-medium text-xs font-mono uppercase tracking-wider text-text">Administration</h5>
             <ul className="space-y-2 text-xs">
               <li>
-                <a
-                  href="/admin/login"
+                <Link
+                  to="/admin/login"
                   className="hover:text-amber transition-colors flex items-center gap-1.5 text-text-2 font-medium"
                 >
                   <Shield className="w-3.5 h-3.5 text-amber" />
                   <span>Administrator Portal</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/admin/login" className="hover:text-text transition-colors">
-                  Supervisor Access
-                </a>
+                <Link to="/admin/login" className="hover:text-text transition-colors">
+                  Supervisor Terminal
+                </Link>
               </li>
               <li>
-                <a href="/admin/dashboard" className="hover:text-text transition-colors">
+                <Link to="/admin/dashboard" className="hover:text-text transition-colors">
                   Municipal Command
-                </a>
+                </Link>
               </li>
               <li>
-                <span className="text-text-4 font-mono text-[11px]">Restricted DPW Terminal</span>
+                <span className="text-text-4 font-mono text-[11px]">Restricted DPW Access</span>
               </li>
             </ul>
           </div>
@@ -120,7 +121,12 @@ export const Footer: React.FC = () => {
         <div className="pt-8 border-t border-line/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-text-4">
           <div>© 2026 RoadGuard AI Infrastructure Systems. All rights reserved.</div>
           <div className="flex items-center gap-4">
-            <a href="#top" className="hover:text-text-3 transition-colors">Back to top ↑</a>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="hover:text-text-3 transition-colors cursor-pointer"
+            >
+              Back to top ↑
+            </button>
             <span>·</span>
             <span>Built for resilient transportation networks</span>
           </div>
