@@ -156,3 +156,4 @@ export const BottomCTA: React.FC<BottomCTAProps> = ({ onOpenDemo }) => {
     </section>
   );
 };
+

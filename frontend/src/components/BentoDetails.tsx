@@ -117,3 +117,4 @@ export const BentoDetails: React.FC = () => {
     </section>
   );
 };
+

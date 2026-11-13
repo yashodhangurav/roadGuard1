@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Play } from 'lucide-react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
+import { ProductPreview } from './components/ProductPreview';
 import { DetectionSection } from './components/DetectionSection';
 import { MappingSection } from './components/MappingSection';
 import { AnalysisSection } from './components/AnalysisSection';
@@ -23,6 +24,7 @@ export const App: React.FC = () => {
       {/* Main Page Sections in Strict Ordinal Reference Sequence */}
       <main className="flex-1">
         <Hero onOpenDemo={() => setIsDemoOpen(true)} />
+        <ProductPreview />
         <DetectionSection />
         <MappingSection />
         <AnalysisSection />

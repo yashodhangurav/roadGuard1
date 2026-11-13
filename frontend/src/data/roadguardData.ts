@@ -26,6 +26,7 @@ export interface DefectItem {
 }
 
 export const NAV_LINKS: NavLink[] = [
+  { label: 'Demo', href: '#demo' },
   { label: 'Detection', href: '#detection' },
   { label: 'Mapping', href: '#mapping' },
   { label: 'Analysis', href: '#analysis' },
