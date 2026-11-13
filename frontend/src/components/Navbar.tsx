@@ -9,6 +9,13 @@ interface NavbarProps {
   onOpenDemo?: () => void;
 }
 
+const DESKTOP_NAV_LINKS = [
+  { label: 'Detection', href: '#detection' },
+  { label: 'Mapping', href: '#mapping' },
+  { label: 'Analysis', href: '#analysis' },
+  { label: 'FAQ', href: '#faq' },
+];
+
 export const Navbar: React.FC<NavbarProps> = ({ onOpenDemo }) => {
   const { isScrolled } = useScrollPosition();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -61,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDemo }) => {
 
         {/* Desktop Navigation Links */}
         <nav className="nav-links hidden md:flex">
-          {NAV_LINKS.map((link) => (
+          {DESKTOP_NAV_LINKS.map((link) => (
             <motion.a
               key={link.href}
               href={link.href}

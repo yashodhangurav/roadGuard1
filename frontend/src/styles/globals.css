@@ -263,7 +263,6 @@
     position: relative;
     margin-top: 88px;
     padding: 0 var(--gutter) 64px;
-    overflow: hidden;
   }
 
   .hero-frame {

@@ -193,8 +193,10 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
           >
             <RoadInspectionVisual />
           </motion.div>
+        </motion.div>
 
-          {/* Floating Telemetry Speech Bubble (.bar-caption) */}
+        {/* Floating Telemetry Speech Bubble & Pill Dock (.bar-dock) directly under .hero-stage matching Aloud */}
+        <div className="bar-dock">
           <AnimatePresence>
             {isScanning && (
               <motion.div
@@ -219,58 +221,55 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
             )}
           </AnimatePresence>
 
-          {/* Iconic Floating Telemetry Pill (.bar.bar-hero) */}
-          <div className="bar-dock">
-            <div
-              ref={magneticRef}
-              onClick={handleSimulateScan}
-              style={{
-                transform: `translate3d(${offset.x}px, ${offset.y}px, 0)`,
-              }}
-              className="bar bar-hero cursor-pointer group"
-              role="button"
-              tabIndex={0}
-              aria-label="Simulate Road Defect Detection Telemetry"
-            >
-              {/* Radar / Microphone Key with Ping Animation */}
-              <div className="bar-key">
-                <span className="relative flex items-center justify-center w-full h-full">
-                  <Radio className="w-3.5 h-3.5 text-amber" />
-                  <span className="absolute inset-0 rounded-md border border-amber/60 animate-ping pointer-events-none" />
-                </span>
-              </div>
+          <div
+            ref={magneticRef}
+            onClick={handleSimulateScan}
+            style={{
+              transform: `translate3d(${offset.x}px, ${offset.y}px, 0)`,
+            }}
+            className="bar bar-hero cursor-pointer group"
+            role="button"
+            tabIndex={0}
+            aria-label="Simulate Road Defect Detection Telemetry"
+          >
+            {/* Radar / Microphone Key with Ping Animation */}
+            <div className="bar-key">
+              <span className="relative flex items-center justify-center w-full h-full">
+                <Radio className="w-3.5 h-3.5 text-amber" />
+                <span className="absolute inset-0 rounded-md border border-amber/60 animate-ping pointer-events-none" />
+              </span>
+            </div>
 
-              {/* Interactive Status Field */}
-              <div className="bar-field">
-                <span className="bar-ph hidden sm:inline">Click to simulate live road inspection</span>
-                <span className="bar-ph sm:hidden">Tap to simulate road scan</span>
-                <span className="bar-try">US-101 · Milepost 14.2 · Depth 72mm</span>
-              </div>
+            {/* Interactive Status Field */}
+            <div className="bar-field">
+              <span className="bar-ph hidden sm:inline">Click to simulate live road inspection</span>
+              <span className="bar-ph sm:hidden">Tap to simulate road scan</span>
+              <span className="bar-try">US-101 · Milepost 14.2 · Depth 72mm</span>
+            </div>
 
-              {/* Dynamic Sensor Telemetry Waveform Bars */}
-              <div className="bar-meter">
-                <div className="bar-bars" aria-hidden="true">
-                  <i style={{ height: isScanning ? '16px' : '6px' }} />
-                  <i style={{ height: isScanning ? '12px' : '14px' }} />
-                  <i style={{ height: isScanning ? '18px' : '8px' }} />
-                  <i style={{ height: isScanning ? '10px' : '16px' }} />
-                  <i style={{ height: isScanning ? '15px' : '10px' }} />
-                </div>
-              </div>
-
-              {/* Live Telemetry Geocode Clock */}
-              <div className="bar-clock hidden md:block">
-                37°46&apos;29&quot;N 122°25&apos;10&quot;W
-              </div>
-
-              {/* RTK Fixed Chip */}
-              <div className="bar-chip hidden sm:flex">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="font-mono text-[11px]">RTK Fixed</span>
+            {/* Dynamic Sensor Telemetry Waveform Bars */}
+            <div className="bar-meter">
+              <div className="bar-bars" aria-hidden="true">
+                <i style={{ height: isScanning ? '16px' : '6px' }} />
+                <i style={{ height: isScanning ? '12px' : '14px' }} />
+                <i style={{ height: isScanning ? '18px' : '8px' }} />
+                <i style={{ height: isScanning ? '10px' : '16px' }} />
+                <i style={{ height: isScanning ? '15px' : '10px' }} />
               </div>
             </div>
+
+            {/* Live Telemetry Geocode Clock */}
+            <div className="bar-clock hidden md:block">
+              37°46&apos;29&quot;N 122°25&apos;10&quot;W
+            </div>
+
+            {/* RTK Fixed Chip */}
+            <div className="bar-chip hidden sm:flex">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-mono text-[11px]">RTK Fixed</span>
+            </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

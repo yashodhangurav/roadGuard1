@@ -93,3 +93,4 @@ export const modalFrame: Variants = {
     transition: { duration: 0.22, ease: EASE_SWIFT },
   },
 };
+
