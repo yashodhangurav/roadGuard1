@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Terminal, Check, CornerDownLeft, RotateCcw } from 'lucide-react';
 import { BeforeAfter } from './BeforeAfter';
+import {
+  EASE_SWIFT,
+  headerMotionVariants,
+  windowReveal,
+  staggerContainer,
+  staggerItem,
+  buttonMotion,
+} from '../styles/motion';
 
 export const ResolutionSection: React.FC = () => {
   const [isRunning, setIsRunning] = useState(false);
@@ -59,27 +68,61 @@ export const ResolutionSection: React.FC = () => {
   };
 
   return (
-    <section id="resolution" className="relative pt-36 md:pt-44">
+    <motion.section
+      id="resolution"
+      className="relative pt-36 md:pt-44"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-10% 0px' }}
+      transition={{ duration: 0.6, ease: EASE_SWIFT }}
+    >
       <div className="wrap">
-        {/* Step Header */}
-        <div className="max-w-[780px] mb-12 md:mb-16">
-          <div className="step">
+        {/* Step Header with Staggered Entrance */}
+        <div className="max-w-[780px] mb-12 md:mb-16 text-left">
+          <motion.div
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            className="step"
+          >
             <span className="step-n">04</span>
             <span className="text-text font-medium">Resolve it</span>
-          </div>
-          <h2 className="text-[clamp(36px,5.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.045em] h2-gradient pb-2">
+          </motion.div>
+          <motion.h2
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={1}
+            className="text-[clamp(36px,5.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.045em] h2-gradient pb-2"
+          >
             Your road crews get the work order
-          </h2>
-          <p className="mt-5 text-text-2 text-[clamp(17px,1.5vw,19px)] leading-[1.6]">
+          </motion.h2>
+          <motion.p
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={2}
+            className="mt-5 text-text-2 text-[clamp(17px,1.5vw,19px)] leading-[1.6]"
+          >
             Maintenance prioritisation and automated inspection reporting. Dispatch repair schedules directly into municipal GIS, work-order databases, or contractor mobile apps with exact coordinates, required asphalt batch volume, and cryptographic photographic proof.
-          </p>
+          </motion.p>
         </div>
 
         {/* Feature Checkpoints & Interactive CLI Dispatch Terminal */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
           {/* Left Column: Feature Checkpoints */}
-          <div className="space-y-6 text-left">
-            <div className="flex items-start gap-4">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="space-y-6 text-left"
+          >
+            <motion.div variants={staggerItem} className="flex items-start gap-4">
               <div className="w-6 h-6 rounded-full bg-white/[0.08] flex items-center justify-center text-amber mt-0.5 shrink-0 border border-line-2">
                 <Check className="w-3.5 h-3.5" />
               </div>
@@ -89,9 +132,9 @@ export const ResolutionSection: React.FC = () => {
                   Work orders sync seamlessly with Esri ArcGIS, Cityworks, Cartegraph, or Maximo with zero manual transcription or GIS re-entry.
                 </p>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="flex items-start gap-4">
+            <motion.div variants={staggerItem} className="flex items-start gap-4">
               <div className="w-6 h-6 rounded-full bg-white/[0.08] flex items-center justify-center text-amber mt-0.5 shrink-0 border border-line-2">
                 <Check className="w-3.5 h-3.5" />
               </div>
@@ -101,9 +144,9 @@ export const ResolutionSection: React.FC = () => {
                   Computes exact cubic meters and patch tonnage from 3D void calculations so municipal asphalt plants batch precisely what is required.
                 </p>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="flex items-start gap-4">
+            <motion.div variants={staggerItem} className="flex items-start gap-4">
               <div className="w-6 h-6 rounded-full bg-white/[0.08] flex items-center justify-center text-amber mt-0.5 shrink-0 border border-line-2">
                 <Check className="w-3.5 h-3.5" />
               </div>
@@ -113,11 +156,17 @@ export const ResolutionSection: React.FC = () => {
                   Generates tamper-evident PDF condition certificates and georeferenced GeoJSON spatial packages signed with hardware timestamp proofs.
                 </p>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* Right Column: Interactive Terminal Window Mockup matching Aloud */}
-          <div className="rounded-card bg-[#0b0c0e] border border-line-2 shadow-window overflow-hidden flex flex-col aspect-[4/3]">
+          {/* Right Column: Interactive Terminal Window Mockup */}
+          <motion.div
+            variants={windowReveal}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="rounded-card bg-[#0b0c0e] border border-line-2 shadow-window overflow-hidden flex flex-col aspect-[4/3]"
+          >
             {/* Terminal Titlebar */}
             <div className="flex items-center justify-between h-9 px-4 border-b border-line bg-[#14161a] text-xs font-mono text-text-3">
               <div className="flex items-center gap-1.5">
@@ -137,9 +186,12 @@ export const ResolutionSection: React.FC = () => {
               {logIndex > 0 ? (
                 <>
                   {rawLogs.slice(0, logIndex).map((log, i) => (
-                    <div
+                    <motion.div
                       key={i}
-                      className={`leading-relaxed animate-fade-in ${
+                      initial={{ opacity: 0, x: -6 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className={`leading-relaxed ${
                         log.type === 'cmd'
                           ? 'text-text-3 font-semibold'
                           : log.type === 'sub'
@@ -150,7 +202,7 @@ export const ResolutionSection: React.FC = () => {
                       }`}
                     >
                       {log.text}
-                    </div>
+                    </motion.div>
                   ))}
 
                   {isRunning && (
@@ -185,16 +237,18 @@ export const ResolutionSection: React.FC = () => {
 
               <div className="flex items-center gap-2">
                 {isCompleted && (
-                  <button
+                  <motion.button
                     onClick={handleReset}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     className="p-1.5 rounded-md text-text-3 hover:text-text hover:bg-white/[0.05] transition-colors"
                     title="Reset Terminal"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
-                  </button>
+                  </motion.button>
                 )}
 
-                <button
+                <motion.button
                   onClick={handleStartDispatch}
                   disabled={isRunning || isCompleted}
                   className={`btn btn-sm text-xs font-mono transition-all ${
@@ -204,20 +258,21 @@ export const ResolutionSection: React.FC = () => {
                       ? 'bg-white/[0.04] text-text-3'
                       : 'btn-ghost hover:bg-white/[0.08] text-text'
                   }`}
+                  {...buttonMotion}
                 >
                   <span>
                     {isCompleted ? 'Dispatched' : isRunning ? 'Dispatching...' : 'Press Enter to dispatch'}
                   </span>
                   <kbd className="ml-1"><CornerDownLeft className="w-3 h-3" /></kbd>
-                </button>
+                </motion.button>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Embedded Before and After Road Restoration Comparison Slider */}
         <BeforeAfter />
       </div>
-    </section>
+    </motion.section>
   );
 };

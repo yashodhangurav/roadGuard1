@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Eye, Play, Radio, Layers, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Eye, Play, Radio, Layers } from 'lucide-react';
 import { RoadInspectionVisual } from './RoadInspectionVisual';
 import { useMagnetic } from '../hooks/useMagnetic';
+import { EASE_SWIFT, buttonMotion } from '../styles/motion';
 
 interface HeroProps {
   onOpenDemo?: () => void;
@@ -10,30 +12,39 @@ interface HeroProps {
 export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
   const [isScanning, setIsScanning] = useState(false);
   const [activeSpeechStep, setActiveSpeechStep] = useState(0);
-  const { ref: magneticRef, offset } = useMagnetic<HTMLDivElement>({ strength: 0.08, maxDistance: 10 });
+
+  // Magnetic spring physics for floating pill bar
+  const { ref: magneticRef, offset } = useMagnetic<HTMLDivElement>({
+    strength: 0.16,
+    maxDistance: 16,
+  });
 
   const captionWords = [
     'Severe',
     'pothole',
     'detected',
     'at',
-    'MP 14.2',
-    '—',
-    'Depth 72mm',
-    '—',
+    'MP',
+    '14.2',
+    '·',
+    'Depth',
+    '7.2',
+    'cm',
+    '·',
     'Logged',
     'to',
-    'Zone 4',
+    'Zone',
+    '4',
     'Municipal',
     'Repair',
     'Queue',
   ];
 
-  const handleBarClick = () => {
+  const handleSimulateScan = () => {
+    if (isScanning) return;
     setIsScanning(true);
     setActiveSpeechStep(0);
 
-    // Synchronously highlight words like Aloud's speech player
     captionWords.forEach((_, i) => {
       setTimeout(() => {
         setActiveSpeechStep(i + 1);
@@ -53,38 +64,60 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
       {/* Hero Copy Container */}
       <div className="wrap flex flex-col items-center text-center relative z-10">
         {/* Fluid Hero Title */}
-        <h1 className="hero-title text-[clamp(28px,7.5vw,104px)] font-normal leading-[1.08] sm:leading-[0.98] tracking-[-0.03em] sm:tracking-[-0.058em] hero-title-gradient pb-2 max-w-5xl">
+        <motion.h1
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: EASE_SWIFT }}
+          className="hero-title text-[clamp(28px,7.5vw,104px)] font-normal leading-[1.08] sm:leading-[0.98] tracking-[-0.03em] sm:tracking-[-0.058em] hero-title-gradient pb-2 max-w-5xl"
+        >
           Intelligent Road<br className="sm:hidden" /> Monitoring.<br />
           Safer Roads.
-        </h1>
+        </motion.h1>
 
         {/* Hero Lede */}
-        <p className="mt-4 sm:mt-7 max-w-[640px] text-text-2 text-[clamp(15px,1.6vw,20px)] leading-[1.55] tracking-[-0.01em] px-2 sm:px-0">
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.65, delay: 0.15, ease: EASE_SWIFT }}
+          className="mt-4 sm:mt-7 max-w-[640px] text-text-2 text-[clamp(15px,1.6vw,20px)] leading-[1.55] tracking-[-0.01em] px-2 sm:px-0"
+        >
           AI-powered road damage detection that transforms road images and videos into actionable infrastructure intelligence.
-        </p>
+        </motion.p>
 
         {/* Hero Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-9 sm:mt-10 w-full max-w-xs sm:max-w-none">
-          <a
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.65, delay: 0.25, ease: EASE_SWIFT }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-9 sm:mt-10 w-full max-w-xs sm:max-w-none"
+        >
+          <motion.a
             href="#detection"
             className="btn btn-light btn-lg shadow-btn-light w-full sm:w-auto"
+            {...buttonMotion}
           >
-            <Eye className="w-4 h-4" />
+            <Eye className="w-4 h-4 text-amber" />
             <span>Explore Detection</span>
-          </a>
+          </motion.a>
 
-          <button
+          <motion.button
             onClick={onOpenDemo}
             className="btn btn-ghost btn-lg shadow-btn-ghost w-full sm:w-auto"
+            {...buttonMotion}
           >
             <Play className="w-3.5 h-3.5 fill-current text-text-2" />
             <span>View Live Demo</span>
             <span className="btn-note">1:20</span>
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
 
         {/* Monospace Spec Pills matching Aloud .hero-meta */}
-        <p className="flex flex-wrap justify-center items-center gap-x-2.5 gap-y-1 mt-6 text-text-3 font-mono text-[12.5px] tracking-wide">
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7, delay: 0.38 }}
+          className="flex flex-wrap justify-center items-center gap-x-2.5 gap-y-1 mt-6 text-text-3 font-mono text-[12.5px] tracking-wide"
+        >
           <span>Edge Vision</span>
           <span className="text-text-4 select-none">·</span>
           <span>Real-Time 60 FPS</span>
@@ -94,7 +127,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
           <span>ASTM D6433 Certified</span>
           <span className="text-text-4 select-none">·</span>
           <span>Model v4.2</span>
-        </p>
+        </motion.p>
       </div>
 
       {/* Hero Stage matching Aloud .hero-stage */}
@@ -102,7 +135,12 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
         {/* Ambient Glow */}
         <div className="hero-glow" aria-hidden="true" />
 
-        <div className="hero-frame">
+        <motion.div
+          initial={{ opacity: 0, y: 32, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.85, delay: 0.2, ease: EASE_SWIFT }}
+          className="hero-frame"
+        >
           {/* Base Console Window (.hero-window) */}
           <figure className="window hero-window">
             {/* Top Window Strip */}
@@ -134,101 +172,105 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
                 </div>
                 <div className="p-3.5 rounded-xl border border-line bg-surface">
                   <div className="text-xs font-mono text-text-3">PCI RATING</div>
-                  <div className="text-sm font-semibold text-text mt-1">68 / 100 (Fair)</div>
-                  <div className="text-xs text-text-3 font-mono mt-1">ASTM D6433</div>
+                  <div className="text-sm font-semibold text-text mt-1">58 / 100</div>
+                  <div className="text-xs text-amber font-mono mt-1">Tier 1 Maintenance</div>
                 </div>
                 <div className="p-3.5 rounded-xl border border-line bg-surface">
                   <div className="text-xs font-mono text-text-3">STATUS</div>
-                  <div className="text-sm font-semibold text-emerald-400 mt-1">Edge Stream Live</div>
-                  <div className="text-xs text-text-3 font-mono mt-1">RTK Accuracy ±4cm</div>
+                  <div className="text-sm font-semibold text-emerald-400 mt-1">Live Processing</div>
+                  <div className="text-xs text-text-3 font-mono mt-1">RTK Lock: ±0.04m</div>
                 </div>
               </div>
             </div>
           </figure>
 
-          {/* Overlapping Live Road Inspection Window (.road-window matching .sb-window) */}
-          <figure className="road-window">
-            <div className="sb-scroll">
-              <RoadInspectionVisual isScanning={isScanning} />
-            </div>
-          </figure>
+          {/* Overlapping Staging Road Inspection Window (.road-window) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.85, delay: 0.35, ease: EASE_SWIFT }}
+            className="road-window"
+          >
+            <RoadInspectionVisual />
+          </motion.div>
 
           {/* Floating Telemetry Speech Bubble (.bar-caption) */}
-          <div className="relative">
-            <div
-              className={`bar-caption ${isScanning ? 'is-on' : ''}`}
-              role="status"
-              aria-live="polite"
-            >
-              {captionWords.map((word, index) => (
-                <span
-                  key={index}
-                  className={`inline-block mr-1.5 transition-all ${
-                    index < activeSpeechStep ? 'is-said text-white font-medium' : 'text-text-3'
-                  }`}
-                >
-                  {word}
-                </span>
-              ))}
-            </div>
-          </div>
+          <AnimatePresence>
+            {isScanning && (
+              <motion.div
+                initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 6, scale: 0.96 }}
+                transition={{ duration: 0.25, ease: EASE_SWIFT }}
+                className="bar-caption is-on"
+                role="status"
+              >
+                {captionWords.map((word, idx) => (
+                  <span
+                    key={idx}
+                    className={`inline-block mr-1 transition-opacity ${
+                      idx < activeSpeechStep ? 'is-said text-white font-medium' : 'text-neutral-400 opacity-40'
+                    }`}
+                  >
+                    {word}
+                  </span>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          {/* Iconic Floating Telemetry Pill (.bar-hero) with Spring Damping Physics */}
+          {/* Iconic Floating Telemetry Pill (.bar.bar-hero) */}
           <div className="bar-dock">
             <div
               ref={magneticRef}
-              onClick={handleBarClick}
+              onClick={handleSimulateScan}
               style={{
                 transform: `translate3d(${offset.x}px, ${offset.y}px, 0)`,
               }}
-              className="bar bar-hero group"
+              className="bar bar-hero cursor-pointer group"
+              role="button"
+              tabIndex={0}
+              aria-label="Simulate Road Defect Detection Telemetry"
             >
-              {/* Radar Key */}
-              <div className="bar-key relative">
-                <Radio className="w-4 h-4 text-amber" />
-                <span className="absolute inset-0 rounded-md border border-amber/40 animate-radar-ping pointer-events-none" />
-              </div>
-
-              {/* Status Field with Hover Transition */}
-              <div className="bar-field flex-1 min-w-0">
-                <span className="bar-ph truncate text-xs sm:text-[13px]">
-                  <span className="hidden sm:inline">Click to simulate live road inspection scan</span>
-                  <span className="sm:hidden">Tap to simulate road scan</span>
-                </span>
-                <span className="bar-try flex items-center gap-1.5 font-medium text-black truncate text-xs sm:text-[13px]">
-                  <Sparkles className="w-3.5 h-3.5 text-amber shrink-0" />
-                  <span className="truncate">Scan Route 101 corridor (MP 14.2)</span>
+              {/* Radar / Microphone Key with Ping Animation */}
+              <div className="bar-key">
+                <span className="relative flex items-center justify-center w-full h-full">
+                  <Radio className="w-3.5 h-3.5 text-amber" />
+                  <span className="absolute inset-0 rounded-md border border-amber/60 animate-ping pointer-events-none" />
                 </span>
               </div>
 
-              {/* Sensor Frequency Vibration Bars */}
-              <div className="bar-meter shrink-0">
-                <div className="bar-bars">
-                  {[16, 8, 20, 14, 18, 10].map((h, i) => (
-                    <i
-                      key={i}
-                      className="bg-[#737373] group-hover:bg-amber transition-colors"
-                      style={{
-                        height: isScanning ? `${Math.max(4, (h * 1.3) % 20)}px` : `${h}px`,
-                      }}
-                    />
-                  ))}
+              {/* Interactive Status Field */}
+              <div className="bar-field">
+                <span className="bar-ph hidden sm:inline">Click to simulate live road inspection</span>
+                <span className="bar-ph sm:hidden">Tap to simulate road scan</span>
+                <span className="bar-try">US-101 · Milepost 14.2 · Depth 72mm</span>
+              </div>
+
+              {/* Dynamic Sensor Telemetry Waveform Bars */}
+              <div className="bar-meter">
+                <div className="bar-bars" aria-hidden="true">
+                  <i style={{ height: isScanning ? '16px' : '6px' }} />
+                  <i style={{ height: isScanning ? '12px' : '14px' }} />
+                  <i style={{ height: isScanning ? '18px' : '8px' }} />
+                  <i style={{ height: isScanning ? '10px' : '16px' }} />
+                  <i style={{ height: isScanning ? '15px' : '10px' }} />
                 </div>
               </div>
 
-              {/* GNSS Coordinates Clock */}
-              <div className="bar-clock hidden md:block font-mono">
-                37°46'29"N 122°25'10"W
+              {/* Live Telemetry Geocode Clock */}
+              <div className="bar-clock hidden md:block">
+                37°46&apos;29&quot;N 122°25&apos;10&quot;W
               </div>
 
-              {/* Chip Badge */}
-              <div className="bar-chip hidden xs:flex sm:flex">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="font-mono text-xs">RTK Fixed</span>
+              {/* RTK Fixed Chip */}
+              <div className="bar-chip hidden sm:flex">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="font-mono text-[11px]">RTK Fixed</span>
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

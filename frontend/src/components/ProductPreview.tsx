@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   MapPin,
   UploadCloud,
@@ -9,8 +10,8 @@ import {
   Info,
   Clock,
 } from 'lucide-react';
+import { EASE_SWIFT, headerMotionVariants, windowReveal, buttonMotion } from '../styles/motion';
 
-// Workflow Defect Specification matching requirements
 export type DefectType = 'Pothole' | 'Longitudinal Crack' | 'Alligator Crack' | 'Surface Deterioration';
 export type SeverityLevel = 'Low' | 'Medium' | 'High' | 'Critical';
 
@@ -196,7 +197,7 @@ export const ProductPreview: React.FC = () => {
     setIsSimulatingScan(true);
     setTimeout(() => {
       setIsSimulatingScan(false);
-    }, 600);
+    }, 1200);
   };
 
   const getSeverityBadge = (severity: SeverityLevel) => {
@@ -233,24 +234,58 @@ export const ProductPreview: React.FC = () => {
   };
 
   return (
-    <section id="demo" className="relative pt-32 md:pt-40">
+    <motion.section
+      id="demo"
+      className="relative pt-32 md:pt-40"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-10% 0px' }}
+      transition={{ duration: 0.6, ease: EASE_SWIFT }}
+    >
       <div className="wrap">
-        {/* Section Header */}
+        {/* Section Header with Staggered Entrance */}
         <div className="max-w-[780px] mb-12 md:mb-16 text-left">
-          <div className="step">
+          <motion.div
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            className="step"
+          >
             <span className="step-n">DEMO</span>
             <span className="text-text font-medium">Interactive Product Demonstration</span>
-          </div>
-          <h2 className="text-[clamp(34px,5.2vw,58px)] font-semibold leading-[1.04] tracking-[-0.045em] h2-gradient pb-2">
+          </motion.div>
+          <motion.h2
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={1}
+            className="text-[clamp(34px,5.2vw,58px)] font-semibold leading-[1.04] tracking-[-0.045em] h2-gradient pb-2"
+          >
             Complete edge inspection in action
-          </h2>
-          <p className="mt-4 text-text-2 text-[clamp(16px,1.5vw,19px)] leading-[1.6]">
+          </motion.h2>
+          <motion.p
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={2}
+            className="mt-4 text-text-2 text-[clamp(16px,1.5vw,19px)] leading-[1.6]"
+          >
             Explore the end-to-end computer vision pipeline: upload road imagery, detect bounding boxes, classify defect types, compute severity indices, and pinpoint GPS locations on the GIS grid.
-          </p>
+          </motion.p>
         </div>
 
-        {/* Studio Window Chrome (Aloud Window Architecture) */}
-        <div className="relative rounded-card border border-line-2 bg-[#090a0d] shadow-window overflow-hidden">
+        {/* Studio Window Chrome with Motion Reveal */}
+        <motion.div
+          variants={windowReveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="relative rounded-card border border-line-2 bg-[#090a0d] shadow-window overflow-hidden"
+        >
           {/* Top Chrome Titlebar with Scene Switcher */}
           <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-line bg-[#12141a]/90 backdrop-blur-md">
             {/* macOS Window Controls + Console Title */}
@@ -286,20 +321,21 @@ export const ProductPreview: React.FC = () => {
               ))}
 
               {/* Mock Upload Button */}
-              <button
+              <motion.button
                 onClick={() => {
                   handleSceneChange((activeSceneIndex + 1) % SAMPLE_SCENES.length);
                 }}
                 className="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-mono text-amber hover:bg-amber/10 transition-colors ml-1"
                 title="Simulate Uploading New Road Image"
+                {...buttonMotion}
               >
                 <UploadCloud className="w-3.5 h-3.5" />
                 <span className="hidden md:inline">Simulate Upload</span>
-              </button>
+              </motion.button>
             </div>
           </div>
 
-          {/* Workflow Studio Main Grid (2-Column Split: Visual Feed on Left / Results + Map on Right) */}
+          {/* Workflow Studio Main Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-[1.32fr_1fr] border-b border-line items-stretch">
             {/* LEFT: 1. ROAD IMAGE INPUT + 2. AI DETECTION BOUNDING BOXES */}
             <div className="relative bg-[#0d0f14] overflow-hidden flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-line select-none">
@@ -378,10 +414,18 @@ export const ProductPreview: React.FC = () => {
                   />
                 </svg>
 
-                {/* Scanning Laser Sweep Effect during simulated upload */}
-                {isSimulatingScan && (
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber/15 to-transparent animate-pulse pointer-events-none border-b-2 border-amber" />
-                )}
+                {/* Scanning Laser Sweep Effect with Framer Motion */}
+                <AnimatePresence>
+                  {isSimulatingScan && (
+                    <motion.div
+                      initial={{ top: '0%', opacity: 0.9 }}
+                      animate={{ top: '100%', opacity: [0.9, 1, 0.4] }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 1.1, ease: 'linear' }}
+                      className="absolute inset-x-0 h-1 bg-amber shadow-[0_0_20px_#d97757] pointer-events-none z-30"
+                    />
+                  )}
+                </AnimatePresence>
 
                 {/* 2. AI DETECTION BOUNDING BOXES OVER DEFECTS */}
                 {showBoundingBoxes &&
@@ -390,8 +434,12 @@ export const ProductPreview: React.FC = () => {
                     const sevTokens = getSeverityBadge(defect.severity);
 
                     return (
-                      <div
+                      <motion.div
                         key={defect.id}
+                        layout
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.35, ease: EASE_SWIFT }}
                         onClick={() => setSelectedDefectId(defect.id)}
                         className={`absolute cursor-pointer transition-all duration-300 group ${
                           isSelected
@@ -443,7 +491,7 @@ export const ProductPreview: React.FC = () => {
                         <div className="absolute -bottom-6 right-0 px-1.5 py-0.5 rounded bg-black/85 border border-line text-[9.5px] font-mono text-text-3 whitespace-nowrap">
                           {defect.depthMm ? `${defect.depthMm}mm depth` : defect.dimensions.split('·')[0]}
                         </div>
-                      </div>
+                      </motion.div>
                     );
                   })}
 
@@ -525,8 +573,10 @@ export const ProductPreview: React.FC = () => {
                       const sevTokens = getSeverityBadge(defect.severity);
 
                       return (
-                        <div
+                        <motion.div
                           key={defect.id}
+                          whileHover={{ x: 2 }}
+                          transition={{ duration: 0.15 }}
                           onClick={() => setSelectedDefectId(defect.id)}
                           className={`p-2.5 rounded-lg border transition-all cursor-pointer flex items-center justify-between ${
                             isSelected
@@ -557,7 +607,7 @@ export const ProductPreview: React.FC = () => {
                             </span>
                             <ChevronRight className="w-3 h-3 text-text-3 inline-block ml-1" />
                           </div>
-                        </div>
+                        </motion.div>
                       );
                     })}
                   </div>
@@ -647,7 +697,7 @@ export const ProductPreview: React.FC = () => {
                     );
                   })}
 
-                  {/* Selected Location Stamp (Bottom Overlay) */}
+                  {/* Selected Location Stamp */}
                   <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between px-2.5 py-1 rounded bg-black/80 backdrop-blur-md border border-line text-[10px] font-mono text-text-3">
                     <span className="text-text font-medium truncate">
                       {selectedDefect.type} · {selectedDefect.coordinates}
@@ -661,7 +711,7 @@ export const ProductPreview: React.FC = () => {
             </div>
           </div>
 
-          {/* Bottom Selected Defect Deep-Dive Banner */}
+          {/* Bottom Selected Defect Deep-Dive Banner with AnimatePresence */}
           <div className="px-5 py-3.5 bg-[#0e1014] flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1.5 text-text font-semibold">
@@ -684,8 +734,8 @@ export const ProductPreview: React.FC = () => {
               </span>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 };

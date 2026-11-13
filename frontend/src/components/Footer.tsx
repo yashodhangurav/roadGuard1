@@ -1,9 +1,16 @@
 import React from 'react';
 import { Shield, Github, ArrowUpRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="pt-24 pb-12 mt-36 border-t border-line text-left text-sm text-text-2">
+    <motion.footer
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-5% 0px' }}
+      transition={{ duration: 0.6 }}
+      className="pt-24 pb-12 mt-36 border-t border-line text-left text-sm text-text-2"
+    >
       <div className="wrap">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-10 lg:gap-8 pb-16">
           {/* Brand Column */}
@@ -90,6 +97,6 @@ export const Footer: React.FC = () => {
           </div>
         </div>
       </div>
-    </footer>
+    </motion.footer>
   );
 };

@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sliders, Activity, ShieldCheck, Box, Crosshair } from 'lucide-react';
+import {
+  EASE_SWIFT,
+  headerMotionVariants,
+  windowReveal,
+} from '../styles/motion';
 
 interface ModelTab {
   name: string;
@@ -98,24 +104,58 @@ export const AnalysisSection: React.FC = () => {
   }, [tabs.length, isPaused]);
 
   return (
-    <section id="analysis" className="relative pt-36 md:pt-44">
+    <motion.section
+      id="analysis"
+      className="relative pt-36 md:pt-44"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-10% 0px' }}
+      transition={{ duration: 0.6, ease: EASE_SWIFT }}
+    >
       <div className="wrap">
-        {/* Step Header */}
-        <div className="max-w-[780px] mb-12 md:mb-16">
-          <div className="step">
+        {/* Step Header with Staggered Entrance */}
+        <div className="max-w-[780px] mb-12 md:mb-16 text-left">
+          <motion.div
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            className="step"
+          >
             <span className="step-n">03</span>
             <span className="text-text font-medium">Analyse it</span>
-          </div>
-          <h2 className="text-[clamp(36px,5.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.045em] h2-gradient pb-2">
+          </motion.div>
+          <motion.h2
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={1}
+            className="text-[clamp(36px,5.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.045em] h2-gradient pb-2"
+          >
             “Is that a puddle or a pothole?” Solved.
-          </h2>
-          <p className="mt-5 text-text-2 text-[clamp(17px,1.5vw,19px)] leading-[1.6]">
+          </motion.h2>
+          <motion.p
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={2}
+            className="mt-5 text-text-2 text-[clamp(17px,1.5vw,19px)] leading-[1.6]"
+          >
             Defect classification, severity ratings, and automated road condition analysis. Raw road video is full of shadows, wet reflections, and tire marks. RoadGuard AI strips optical noise, computes true crater depth in 3D, and turns chaotic imagery into audited ASTM D6433 engineering data.
-          </p>
+          </motion.p>
         </div>
 
         {/* Telemetry Noise Diff Component matching Aloud #diff */}
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-5 items-stretch">
+        <motion.div
+          variants={windowReveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-5 items-stretch"
+        >
           {/* Left: Raw Sensor Input with False Positives Strikethrough */}
           <div className="p-6 md:p-8 rounded-card border border-line bg-surface shadow-card text-left flex flex-col justify-between">
             <div>
@@ -156,9 +196,12 @@ export const AnalysisSection: React.FC = () => {
 
           {/* Middle: Directional Flow Arrow */}
           <div className="flex md:flex-col items-center justify-center p-3 text-text-3">
-            <div className="w-10 h-10 rounded-full bg-white/[0.04] border border-line-2 flex items-center justify-center text-amber shadow-sm">
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              className="w-10 h-10 rounded-full bg-white/[0.04] border border-line-2 flex items-center justify-center text-amber shadow-sm"
+            >
               <ArrowRight className="w-5 h-5" />
-            </div>
+            </motion.div>
           </div>
 
           {/* Right: Clean Verified Engineering Telemetry */}
@@ -170,7 +213,11 @@ export const AnalysisSection: React.FC = () => {
               </div>
               <div className="space-y-3.5">
                 {/* Defect Spec Card 1 */}
-                <div className="p-3.5 rounded-lg bg-surface-2 border border-line-2 hover:border-amber/40 transition-colors">
+                <motion.div
+                  whileHover={{ x: 2 }}
+                  transition={{ duration: 0.15 }}
+                  className="p-3.5 rounded-lg bg-surface-2 border border-line-2 hover:border-amber/40 transition-colors"
+                >
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-text text-sm flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-amber" />
@@ -183,10 +230,14 @@ export const AnalysisSection: React.FC = () => {
                   <div className="text-xs text-text-3 mt-1.5 font-mono">
                     Void: 420mm × 380mm × 72mm · Volume: 0.11 m³ · Hot-Mix Patch
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Defect Spec Card 2 */}
-                <div className="p-3.5 rounded-lg bg-surface-2 border border-line-2 hover:border-amber/40 transition-colors">
+                <motion.div
+                  whileHover={{ x: 2 }}
+                  transition={{ duration: 0.15 }}
+                  className="p-3.5 rounded-lg bg-surface-2 border border-line-2 hover:border-amber/40 transition-colors"
+                >
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-text text-sm flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-orange-400" />
@@ -199,7 +250,7 @@ export const AnalysisSection: React.FC = () => {
                   <div className="text-xs text-text-3 mt-1.5 font-mono">
                     Length: 2.8m · Width: 14mm · Depth: 18mm · Rubberized Mastic
                   </div>
-                </div>
+                </motion.div>
               </div>
             </div>
 
@@ -208,7 +259,7 @@ export const AnalysisSection: React.FC = () => {
               <span className="text-amber font-semibold">Tier 1 Municipal Maintenance</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Diff Legend */}
         <div className="flex flex-wrap justify-center items-center gap-6 mt-6 text-xs text-text-3">
@@ -259,58 +310,73 @@ export const AnalysisSection: React.FC = () => {
                   <Icon className="w-4 h-4 text-amber" />
                   <span>{tab.name}</span>
 
-                  {/* Auto-Timer Progress Bar on Active Tab */}
+                  {/* Auto-Timer Progress Bar on Active Tab with Framer Motion */}
                   {isActive && !isPaused && (
-                    <span className="absolute bottom-1 inset-x-5 h-[2px] rounded-full bg-amber/80 animate-flow-bar origin-left" />
+                    <motion.span
+                      layoutId="tabProgressLine"
+                      className="absolute bottom-1 inset-x-5 h-[2px] rounded-full bg-amber/80 origin-left"
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 6.5, ease: 'linear' }}
+                    />
                   )}
                 </button>
               );
             })}
           </div>
 
-          {/* Active Tab Panel */}
-          <div className="p-8 md:p-10 rounded-card border border-line-2 bg-surface shadow-card text-left">
-            <div className="flex flex-wrap items-start justify-between gap-4 pb-6 border-b border-line mb-6">
-              <div>
-                <div className="flex items-center gap-3">
-                  <h4 className="text-lg font-semibold text-text">{tabs[activeTab].name}</h4>
-                  <span className="text-xs font-mono px-2 py-0.5 rounded bg-white/[0.05] border border-line text-amber">
-                    {tabs[activeTab].architecture}
-                  </span>
+          {/* Active Tab Panel with Crossfade Motion */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={tabs[activeTab].name}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.28, ease: EASE_SWIFT }}
+              className="p-8 md:p-10 rounded-card border border-line-2 bg-surface shadow-card text-left"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-4 pb-6 border-b border-line mb-6">
+                <div>
+                  <div className="flex items-center gap-3">
+                    <h4 className="text-lg font-semibold text-text">{tabs[activeTab].name}</h4>
+                    <span className="text-xs font-mono px-2 py-0.5 rounded bg-white/[0.05] border border-line text-amber">
+                      {tabs[activeTab].architecture}
+                    </span>
+                  </div>
+                  <p className="text-sm text-text-2 max-w-2xl mt-2 leading-relaxed">
+                    {tabs[activeTab].desc}
+                  </p>
                 </div>
-                <p className="text-sm text-text-2 max-w-2xl mt-2 leading-relaxed">
-                  {tabs[activeTab].desc}
-                </p>
+
+                <div className="flex items-center gap-4 text-xs font-mono">
+                  <div className="px-3 py-1.5 rounded-lg bg-surface-2 border border-line">
+                    <span className="text-text-3 block text-[10px] uppercase">Accuracy</span>
+                    <span className="text-text font-semibold">{tabs[activeTab].mAP}</span>
+                  </div>
+                  <div className="px-3 py-1.5 rounded-lg bg-surface-2 border border-line">
+                    <span className="text-text-3 block text-[10px] uppercase">Latency</span>
+                    <span className="text-emerald-400 font-semibold">{tabs[activeTab].latency}</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-center gap-4 text-xs font-mono">
-                <div className="px-3 py-1.5 rounded-lg bg-surface-2 border border-line">
-                  <span className="text-text-3 block text-[10px] uppercase">Accuracy</span>
-                  <span className="text-text font-semibold">{tabs[activeTab].mAP}</span>
-                </div>
-                <div className="px-3 py-1.5 rounded-lg bg-surface-2 border border-line">
-                  <span className="text-text-3 block text-[10px] uppercase">Latency</span>
-                  <span className="text-emerald-400 font-semibold">{tabs[activeTab].latency}</span>
-                </div>
+              {/* Sub-metrics Grid for Active Model */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {tabs[activeTab].metrics.map((metric, idx) => (
+                  <div key={idx} className="p-4 rounded-xl bg-surface-2/60 border border-line">
+                    <span className="block text-[11px] font-mono text-text-3 uppercase tracking-wider mb-1">
+                      {metric.label}
+                    </span>
+                    <span className="text-base font-semibold text-text font-mono">
+                      {metric.value}
+                    </span>
+                  </div>
+                ))}
               </div>
-            </div>
-
-            {/* Sub-metrics Grid for Active Model */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {tabs[activeTab].metrics.map((metric, idx) => (
-                <div key={idx} className="p-4 rounded-xl bg-surface-2/60 border border-line">
-                  <span className="block text-[11px] font-mono text-text-3 uppercase tracking-wider mb-1">
-                    {metric.label}
-                  </span>
-                  <span className="text-base font-semibold text-text font-mono">
-                    {metric.value}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };

@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { CheckCircle2, SlidersHorizontal, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { EASE_SWIFT, staggerContainer, staggerItem } from '../styles/motion';
 
 export const BeforeAfter: React.FC = () => {
   const [sliderPosition, setSliderPosition] = useState(50);
@@ -44,7 +46,7 @@ export const BeforeAfter: React.FC = () => {
       const interval = setInterval(() => {
         step++;
         const progress = step / duration;
-        // Quartic ease out
+        // Quartic ease out matching Aloud
         const ease = 1 - Math.pow(1 - progress, 4);
         const current = start + (target - start) * ease;
         setSliderPosition(current);
@@ -64,7 +66,13 @@ export const BeforeAfter: React.FC = () => {
   return (
     <div className="mt-28">
       {/* Section Subhead */}
-      <div className="flex flex-wrap items-baseline justify-between gap-4 mb-8 text-left">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, ease: EASE_SWIFT }}
+        className="flex flex-wrap items-baseline justify-between gap-4 mb-8 text-left"
+      >
         <div>
           <h3 className="text-xl md:text-2xl font-semibold text-text tracking-tight">
             Forty-eight hours later
@@ -73,15 +81,19 @@ export const BeforeAfter: React.FC = () => {
             The same road surface, after municipal crews executed the patch plan. Drag across to compare.
           </p>
         </div>
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 items-stretch">
         {/* Interactive Split Compare Slider */}
-        <div
+        <motion.div
           ref={containerRef}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
+          initial={{ opacity: 0, scale: 0.98 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, ease: EASE_SWIFT }}
           className="relative aspect-[16/10] md:aspect-[16/9] rounded-card border border-line-2 bg-[#0c0d10] overflow-hidden shadow-window cursor-ew-resize select-none touch-none"
         >
           {/* Base Layer: BEFORE (Damaged Asphalt with 72mm Crater) */}
@@ -209,10 +221,16 @@ export const BeforeAfter: React.FC = () => {
               <SlidersHorizontal className="w-4 h-4 text-neutral-900" />
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Right Column: Repair Verification Checklist */}
-        <div className="p-6 rounded-card border border-line-2 bg-surface shadow-card text-left flex flex-col justify-between">
+        {/* Right Column: Repair Verification Checklist with Staggered Entrance */}
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="p-6 rounded-card border border-line-2 bg-surface shadow-card text-left flex flex-col justify-between"
+        >
           <div>
             <div className="flex items-center justify-between pb-3.5 border-b border-line text-xs font-mono text-text-3">
               <span className="font-semibold text-text">REPAIR VERIFICATION</span>
@@ -221,13 +239,24 @@ export const BeforeAfter: React.FC = () => {
 
             <div className="divide-y divide-line/60 py-2">
               {tasks.map((task, i) => (
-                <div key={i} className="py-3 flex items-start gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                <motion.div
+                  key={i}
+                  variants={staggerItem}
+                  className="py-3 flex items-start gap-3"
+                >
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 20, delay: i * 0.1 }}
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                  </motion.div>
                   <div>
                     <h5 className="text-sm font-semibold text-text leading-tight">{task.title}</h5>
                     <p className="text-[11px] text-text-3 font-mono mt-0.5">{task.time}</p>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -235,7 +264,7 @@ export const BeforeAfter: React.FC = () => {
           <div className="pt-4 border-t border-line text-xs text-text-3 leading-relaxed">
             Every completed repair logs timestamped before/after photographic evidence and contractor verification stamps back to municipal GIS.
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

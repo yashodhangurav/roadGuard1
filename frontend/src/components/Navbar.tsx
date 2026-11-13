@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Play, Eye, Menu, X } from 'lucide-react';
 import { NAV_LINKS } from '../data/roadguardData';
 import { useScrollPosition } from '../hooks/useScrollPosition';
+import { EASE_SWIFT, buttonMotion } from '../styles/motion';
 
 interface NavbarProps {
   onOpenDemo?: () => void;
@@ -42,25 +44,33 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDemo }) => {
 
       <div className="nav-inner">
         {/* Brand Logo */}
-        <a href="#" className="flex items-center gap-2.5 group">
+        <motion.a
+          href="#"
+          className="flex items-center gap-2.5 group"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.18, ease: EASE_SWIFT }}
+        >
           <div className="w-8 h-8 rounded-lg bg-surface-2 border border-line-2 flex items-center justify-center text-text shadow-sm group-hover:border-line-3 transition-colors">
             <Shield className="w-4 h-4 text-amber" />
           </div>
           <span className="font-semibold text-[15px] tracking-tight text-text">
             ROADGUARD <span className="text-amber font-bold">AI</span>
           </span>
-        </a>
+        </motion.a>
 
         {/* Desktop Navigation Links */}
         <nav className="nav-links hidden md:flex">
           {NAV_LINKS.map((link) => (
-            <a
+            <motion.a
               key={link.href}
               href={link.href}
-              className="text-sm text-text-2 hover:text-text transition-colors"
+              className="text-sm text-text-2 hover:text-text transition-colors relative"
+              whileHover={{ y: -1 }}
+              transition={{ duration: 0.15 }}
             >
               {link.label}
-            </a>
+            </motion.a>
           ))}
         </nav>
 
@@ -77,64 +87,74 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDemo }) => {
           </button>
 
           {/* Primary CTA */}
-          <a
+          <motion.a
             href="#detection"
             className="btn btn-light btn-sm shadow-btn-light"
+            {...buttonMotion}
           >
             <Eye className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Explore Detection</span>
             <span className="sm:hidden">Explore</span>
-          </a>
+          </motion.a>
 
           {/* Mobile Hamburger Button */}
-          <button
+          <motion.button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden flex items-center justify-center w-8 h-8 rounded-full border border-line-2 bg-surface text-text hover:bg-surface-2 transition-colors shrink-0"
             aria-label="Toggle Navigation Menu"
+            whileTap={{ scale: 0.9 }}
           >
             {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-          </button>
+          </motion.button>
         </div>
       </div>
 
-      {/* Mobile Navigation Dropdown Drawer */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-b border-line bg-surface/95 backdrop-blur-2xl px-6 py-5 space-y-4 shadow-2xl animate-fade-in">
-          <nav className="flex flex-col space-y-2.5">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-base text-text-2 hover:text-text font-medium py-1 transition-colors"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
+      {/* Mobile Navigation Dropdown Drawer with Framer Motion AnimatePresence */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.28, ease: EASE_SWIFT }}
+            className="md:hidden border-b border-line bg-surface/98 backdrop-blur-2xl px-6 py-5 space-y-4 shadow-2xl overflow-hidden"
+          >
+            <nav className="flex flex-col space-y-2.5">
+              {NAV_LINKS.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-base text-text-2 hover:text-text font-medium py-1 transition-colors"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </nav>
 
-          <div className="pt-3 border-t border-line flex flex-col gap-2.5">
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenDemo?.();
-              }}
-              className="btn btn-ghost w-full justify-center"
-            >
-              <Play className="w-3.5 h-3.5 fill-current text-text-2" />
-              <span>View Live Demo</span>
-            </button>
-            <a
-              href="#detection"
-              onClick={() => setMobileMenuOpen(false)}
-              className="btn btn-light w-full justify-center shadow-btn-light"
-            >
-              <Eye className="w-4 h-4" />
-              <span>Explore Detection</span>
-            </a>
-          </div>
-        </div>
-      )}
+            <div className="pt-3 border-t border-line flex flex-col gap-2.5">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenDemo?.();
+                }}
+                className="btn btn-ghost w-full justify-center"
+              >
+                <Play className="w-3.5 h-3.5 fill-current text-text-2" />
+                <span>View Live Demo</span>
+              </button>
+              <a
+                href="#detection"
+                onClick={() => setMobileMenuOpen(false)}
+                className="btn btn-light w-full justify-center shadow-btn-light"
+              >
+                <Eye className="w-4 h-4" />
+                <span>Explore Detection</span>
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

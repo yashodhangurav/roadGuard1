@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Satellite, MapPin, Layers, Radio, ChevronRight, CheckCircle2, Navigation } from 'lucide-react';
+import {
+  EASE_SWIFT,
+  headerMotionVariants,
+  windowReveal,
+  staggerContainer,
+  staggerItem,
+} from '../styles/motion';
 
 interface DefectPoint {
   id: string;
@@ -77,26 +85,60 @@ export const MappingSection: React.FC = () => {
   const selectedDefect = PIN_DEFECTS.find((d) => d.id === selectedId) || PIN_DEFECTS[0];
 
   return (
-    <section id="mapping" className="relative pt-36 md:pt-44">
+    <motion.section
+      id="mapping"
+      className="relative pt-36 md:pt-44"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-10% 0px' }}
+      transition={{ duration: 0.6, ease: EASE_SWIFT }}
+    >
       <div className="wrap">
-        {/* Step Header */}
-        <div className="max-w-[780px] mb-12 md:mb-16">
-          <div className="step">
+        {/* Step Header with Staggered Entrance */}
+        <div className="max-w-[780px] mb-12 md:mb-16 text-left">
+          <motion.div
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            className="step"
+          >
             <span className="step-n">02</span>
             <span className="text-text font-medium">Map it</span>
-          </div>
-          <h2 className="text-[clamp(36px,5.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.045em] h2-gradient pb-2">
+          </motion.div>
+          <motion.h2
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={1}
+            className="text-[clamp(36px,5.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.045em] h2-gradient pb-2"
+          >
             Every defect pinned to the global grid
-          </h2>
-          <p className="mt-5 text-text-2 text-[clamp(17px,1.5vw,19px)] leading-[1.6]">
+          </motion.h2>
+          <motion.p
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={2}
+            className="mt-5 text-text-2 text-[clamp(17px,1.5vw,19px)] leading-[1.6]"
+          >
             Geographical visualisation of road defects across regional highway networks and municipal grids. RoadGuard AI geo-tags every anomaly with sub-meter GNSS coordinates, clustering repairs onto interactive GIS layers so road crews plan optimal paving routes.
-          </p>
+          </motion.p>
         </div>
 
         {/* Spatial Desk Grid (Asymmetric Split 1.38fr : 1fr) */}
         <div className="grid grid-cols-1 lg:grid-cols-[1.38fr_1fr] gap-6 items-start">
           {/* Main Interactive GIS Vector Map Canvas */}
-          <div className="relative rounded-card border border-line-2 bg-[#090b0e] overflow-hidden shadow-window flex flex-col">
+          <motion.div
+            variants={windowReveal}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="relative rounded-card border border-line-2 bg-[#090b0e] overflow-hidden shadow-window flex flex-col"
+          >
             {/* Map Top Bar */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-line bg-[#101318]/90 backdrop-blur-md">
               <div className="flex items-center gap-2.5">
@@ -235,7 +277,7 @@ export const MappingSection: React.FC = () => {
                 );
               })}
 
-              {/* Selected Pin HUD Card (Bottom Left of Map) */}
+              {/* Selected Pin HUD Card */}
               <div className="absolute left-4 bottom-16 sm:bottom-14 z-20 max-w-[280px] p-3 rounded-xl bg-[#101318]/95 border border-line-2 shadow-2xl backdrop-blur-md">
                 <div className="flex items-center justify-between gap-2 mb-1.5 pb-1 border-b border-line">
                   <span className="text-xs font-semibold text-text flex items-center gap-1.5">
@@ -265,7 +307,7 @@ export const MappingSection: React.FC = () => {
                 </div>
               </div>
 
-              {/* Floating GIS Telemetry Bar (.bar-desk matching Aloud) */}
+              {/* Floating GIS Telemetry Bar */}
               <div className="absolute left-1/2 -translate-x-1/2 bottom-3 z-20 w-[92%] max-w-[480px]">
                 <div className="flex items-center justify-between px-3.5 py-2 rounded-full bg-white text-[#1a1a1a] shadow-2xl border border-black/10 text-xs font-medium">
                   <div className="flex items-center gap-2">
@@ -283,10 +325,16 @@ export const MappingSection: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Column: Spatial Cluster Work Order Stack */}
-          <div className="flex flex-col gap-4">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.65, delay: 0.2, ease: EASE_SWIFT }}
+            className="flex flex-col gap-4 text-left"
+          >
             {/* Cluster Dispatch Summary Header Card */}
             <div className="p-5 rounded-card border border-line-2 bg-surface shadow-card text-left">
               <div className="flex items-center justify-between mb-3">
@@ -332,14 +380,23 @@ export const MappingSection: React.FC = () => {
               </div>
             </div>
 
-            {/* List of Surveyed Defects */}
-            <div className="flex flex-col gap-2.5">
+            {/* List of Surveyed Defects with Staggered Entrance */}
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="flex flex-col gap-2.5"
+            >
               {PIN_DEFECTS.map((pin) => {
                 const isSelected = pin.id === selectedId;
 
                 return (
-                  <div
+                  <motion.div
                     key={pin.id}
+                    variants={staggerItem}
+                    whileHover={{ x: 3 }}
+                    transition={{ duration: 0.18, ease: EASE_SWIFT }}
                     onClick={() => setSelectedId(pin.id)}
                     className={`p-3.5 rounded-card border transition-all text-left cursor-pointer ${
                       isSelected
@@ -370,10 +427,10 @@ export const MappingSection: React.FC = () => {
                       <span>{pin.location}</span>
                       <ChevronRight className="w-3.5 h-3.5 text-text-3" />
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
 
             {/* Municipal GIS Export Action */}
             <div className="p-3.5 rounded-xl border border-line bg-surface-2/60 flex items-center justify-between text-xs text-text-2">
@@ -386,9 +443,9 @@ export const MappingSection: React.FC = () => {
                 GeoJSON v2.1
               </span>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };

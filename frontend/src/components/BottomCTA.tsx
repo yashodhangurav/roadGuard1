@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Eye, Play, ShieldAlert } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { buttonMotion, headerMotionVariants, EASE_SWIFT } from '../styles/motion';
 
 interface BottomCTAProps {
   onOpenDemo: () => void;
@@ -112,38 +114,80 @@ export const BottomCTA: React.FC<BottomCTAProps> = ({ onOpenDemo }) => {
 
       <div className="wrap relative z-10 flex flex-col items-center text-center">
         {/* Embossed RoadGuard Radar Shield Icon (104px x 104px matching Aloud) */}
-        <div className="relative mb-8 group">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.88, y: 16 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: true, margin: '-10% 0px' }}
+          transition={{ duration: 0.65, ease: EASE_SWIFT }}
+          className="relative mb-8 group cursor-pointer"
+        >
           <div className="absolute -inset-4 rounded-3xl bg-amber/20 blur-2xl opacity-50 group-hover:opacity-80 transition-opacity" />
-          <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-b from-[#222222] via-[#161616] to-[#0d0d0d] border border-line-3 shadow-[0_24px_50px_rgba(0,0,0,0.8)] flex items-center justify-center text-amber transform transition-transform group-hover:scale-105">
+          <motion.div
+            whileHover={{ scale: 1.05, rotate: 1.5 }}
+            transition={{ duration: 0.25, ease: EASE_SWIFT }}
+            className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-b from-[#222222] via-[#161616] to-[#0d0d0d] border border-line-3 shadow-[0_24px_50px_rgba(0,0,0,0.8)] flex items-center justify-center text-amber"
+          >
             <ShieldAlert className="w-12 h-12 sm:w-14 sm:h-14 stroke-[1.5]" />
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Headline */}
-        <h2 className="text-[clamp(36px,6vw,68px)] font-semibold leading-[1.02] tracking-[-0.05em] hero-title-gradient max-w-3xl mb-5">
+        <motion.h2
+          variants={headerMotionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-10% 0px' }}
+          className="text-[clamp(36px,6vw,68px)] font-semibold leading-[1.02] tracking-[-0.05em] hero-title-gradient max-w-3xl mb-5"
+        >
           Safer roads begin with a single scan.
-        </h2>
+        </motion.h2>
 
         {/* Lede */}
-        <p className="text-[clamp(16px,1.6vw,19px)] text-text-2 max-w-xl mb-10 leading-relaxed">
+        <motion.p
+          variants={headerMotionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-10% 0px' }}
+          className="text-[clamp(16px,1.6vw,19px)] text-text-2 max-w-xl mb-10 leading-relaxed"
+        >
           Equip municipal fleet vehicles, highway inspection trucks, or explore our interactive computer vision playground today.
-        </p>
+        </motion.p>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-3.5 mb-12">
-          <a href="#detection" className="btn btn-light btn-lg">
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-10% 0px' }}
+          transition={{ duration: 0.5, delay: 0.1, ease: EASE_SWIFT }}
+          className="flex flex-wrap items-center justify-center gap-3.5 mb-12"
+        >
+          <motion.a
+            href="#detection"
+            className="btn btn-light btn-lg"
+            {...buttonMotion}
+          >
             <Eye className="w-4 h-4 text-amber" />
             <span>Explore Detection</span>
-          </a>
-          <button onClick={onOpenDemo} className="btn btn-ghost btn-lg">
+          </motion.a>
+          <motion.button
+            onClick={onOpenDemo}
+            className="btn btn-ghost btn-lg"
+            {...buttonMotion}
+          >
             <Play className="w-4 h-4 fill-current" />
             <span>View Live Demo</span>
             <span className="btn-note">1:20</span>
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
 
         {/* Telemetry Version Badge matching Aloud dl-meta */}
-        <div className="inline-flex flex-wrap items-center justify-center gap-2 text-xs font-mono text-text-3 px-4 py-2 rounded-full bg-white/[0.04] border border-line">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: '-5% 0px' }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="inline-flex flex-wrap items-center justify-center gap-2 text-xs font-mono text-text-3 px-4 py-2 rounded-full bg-white/[0.04] border border-line"
+        >
           <span>Engine v4.2.0</span>
           <span>·</span>
           <span>Core Weights 84 MB</span>
@@ -151,7 +195,7 @@ export const BottomCTA: React.FC<BottomCTAProps> = ({ onOpenDemo }) => {
           <span>Certified ASTM D6433</span>
           <span>·</span>
           <span>November 2026</span>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

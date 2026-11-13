@@ -10,12 +10,15 @@
     background-color: var(--bg);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, 'Geist', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
+    max-width: 100%;
   }
 
   body {
     background-color: var(--bg);
     color: var(--text);
     overflow-x: hidden;
+    max-width: 100%;
   }
 
   ::selection {
@@ -219,7 +222,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-left: 4px;
+    margin-left: auto;
   }
 
   .nav-watch {
@@ -260,11 +263,13 @@
     position: relative;
     margin-top: 88px;
     padding: 0 var(--gutter) 64px;
+    overflow: hidden;
   }
 
   .hero-frame {
     position: relative;
     z-index: 1;
+    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
   }

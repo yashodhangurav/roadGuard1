@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FAQ_ITEMS } from '../data/roadguardData';
+import { EASE_SWIFT, headerMotionVariants, staggerContainer, staggerItem } from '../styles/motion';
 
 export const FAQ: React.FC = () => {
   // Track open state of FAQ items (first item open by default for immediate affordance)
@@ -23,7 +25,12 @@ export const FAQ: React.FC = () => {
       <div className="wrap">
         <div className="grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-12 lg:gap-16 text-left items-start">
           {/* Left Column: Heading, Domain Context and Direct Contact */}
-          <div>
+          <motion.div
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-10% 0px' }}
+          >
             <div className="step">
               <span className="step-n">FAQ</span>
               <span className="text-text font-medium">Knowledge Base</span>
@@ -37,7 +44,10 @@ export const FAQ: React.FC = () => {
               Everything you need to know about automated road damage detection, ASTM D6433 Pavement Condition Index ratings, and edge dashcam ingestion.
             </p>
 
-            <div className="mt-8 p-4 rounded-xl border border-line bg-surface/60 max-w-sm">
+            <motion.div
+              variants={staggerItem}
+              className="mt-8 p-4 rounded-xl border border-line bg-surface/60 max-w-sm"
+            >
               <div className="text-xs font-semibold text-text mb-1">Planning a municipal deployment?</div>
               <p className="text-xs text-text-3 leading-relaxed mb-3">
                 Our civil engineering team provides technical corridor assessments and GIS pilot integrations.
@@ -48,49 +58,66 @@ export const FAQ: React.FC = () => {
               >
                 civil@roadguard.ai →
               </a>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* Right Column: Expandable Accordion with Smooth CSS Transitions */}
-          <div className="border-t border-line divide-y divide-line">
+          {/* Right Column: Expandable Accordion with Smooth Framer Motion Transitions */}
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-10% 0px' }}
+            className="border-t border-line divide-y divide-line"
+          >
             {FAQ_ITEMS.map((item) => {
               const isOpen = openIds.has(item.id);
 
               return (
-                <div key={item.id} className="py-5 text-left transition-colors">
+                <motion.div
+                  key={item.id}
+                  variants={staggerItem}
+                  className="py-5 text-left transition-colors"
+                >
                   <button
                     onClick={() => toggleItem(item.id)}
                     aria-expanded={isOpen}
                     className="w-full flex items-center justify-between gap-6 list-none font-medium text-base text-text tracking-tight hover:text-white transition-colors group text-left cursor-pointer"
                   >
                     <span className="group-hover:text-white transition-colors">{item.question}</span>
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border transition-all duration-300 ${
+                    <motion.div
+                      animate={{ rotate: isOpen ? 45 : 0 }}
+                      transition={{ duration: 0.25, ease: EASE_SWIFT }}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border transition-colors ${
                         isOpen
-                          ? 'rotate-45 bg-amber/15 text-amber border-amber/40'
+                          ? 'bg-amber/15 text-amber border-amber/40'
                           : 'bg-white/[0.04] text-text-3 border-line group-hover:border-line-2 group-hover:text-text'
                       }`}
                     >
                       <Plus className="w-3.5 h-3.5" />
-                    </div>
+                    </motion.div>
                   </button>
 
-                  {/* Accordion Content with Smooth Transition */}
-                  <div
-                    className={`grid transition-all duration-300 ease-out overflow-hidden ${
-                      isOpen ? 'grid-rows-[1fr] opacity-100 mt-3.5' : 'grid-rows-[0fr] opacity-0'
-                    }`}
-                  >
-                    <div className="overflow-hidden">
-                      <p className="text-sm text-text-2 leading-relaxed max-w-xl pb-1">
-                        {item.answer}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                  {/* Accordion Content with Framer Motion AnimatePresence */}
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        key="content"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.35, ease: EASE_SWIFT }}
+                        className="overflow-hidden"
+                      >
+                        <p className="text-sm text-text-2 leading-relaxed max-w-xl pb-2 pt-3">
+                          {item.answer}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

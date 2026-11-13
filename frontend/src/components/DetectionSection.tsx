@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Target, Video, Cpu, AlertTriangle, Layers, Eye, Gauge, Crosshair } from 'lucide-react';
+import {
+  EASE_SWIFT,
+  headerMotionVariants,
+  windowReveal,
+  staggerContainer,
+  staggerItem,
+} from '../styles/motion';
 
 type ViewMode = 'rgb' | 'depth' | 'mask';
 
@@ -8,24 +16,58 @@ export const DetectionSection: React.FC = () => {
   const [selectedDefect, setSelectedDefect] = useState<'pothole' | 'crack' | null>('pothole');
 
   return (
-    <section id="detection" className="relative pt-36 md:pt-44">
+    <motion.section
+      id="detection"
+      className="relative pt-36 md:pt-44"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: '-10% 0px' }}
+      transition={{ duration: 0.6, ease: EASE_SWIFT }}
+    >
       <div className="wrap">
         {/* Step Eyebrow & Header */}
-        <div className="max-w-[780px] mb-12 md:mb-16">
-          <div className="step">
+        <div className="max-w-[780px] mb-12 md:mb-16 text-left">
+          <motion.div
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            className="step"
+          >
             <span className="step-n">01</span>
             <span className="text-text font-medium">Detect it</span>
-          </div>
-          <h2 className="text-[clamp(36px,5.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.045em] h2-gradient pb-2">
+          </motion.div>
+          <motion.h2
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={1}
+            className="text-[clamp(36px,5.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.045em] h2-gradient pb-2"
+          >
             RoadGuard AI spots what drivers miss
-          </h2>
-          <p className="mt-5 text-text-2 text-[clamp(17px,1.5vw,19px)] leading-[1.6]">
+          </motion.h2>
+          <motion.p
+            variants={headerMotionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={2}
+            className="mt-5 text-text-2 text-[clamp(17px,1.5vw,19px)] leading-[1.6]"
+          >
             Automated pothole and road defect detection using real-time computer vision. Ingest high-speed dashcam feeds, mobile camera frames, and drone aerials to locate surface deterioration with millimeter precision — and zero human latency.
-          </p>
+          </motion.p>
         </div>
 
-        {/* Product Demonstration Display Window */}
-        <div className="relative rounded-card border border-line-2 bg-surface overflow-hidden shadow-window mb-8">
+        {/* Product Demonstration Display Window with Motion Reveal */}
+        <motion.div
+          variants={windowReveal}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="relative rounded-card border border-line-2 bg-surface overflow-hidden shadow-window mb-8"
+        >
           {/* Studio Window Chrome Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-line-2 bg-[#121212]/90 backdrop-blur-md">
             {/* macOS Window Controls + Title */}
@@ -44,7 +86,7 @@ export const DetectionSection: React.FC = () => {
             <div className="flex items-center gap-1 p-0.5 rounded-lg bg-black/40 border border-line">
               <button
                 onClick={() => setActiveMode('rgb')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                className={`relative flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
                   activeMode === 'rgb'
                     ? 'bg-white/10 text-text shadow-sm'
                     : 'text-text-3 hover:text-text-2'
@@ -55,7 +97,7 @@ export const DetectionSection: React.FC = () => {
               </button>
               <button
                 onClick={() => setActiveMode('depth')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                className={`relative flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
                   activeMode === 'depth'
                     ? 'bg-amber/20 text-amber border border-amber/30'
                     : 'text-text-3 hover:text-text-2'
@@ -66,7 +108,7 @@ export const DetectionSection: React.FC = () => {
               </button>
               <button
                 onClick={() => setActiveMode('mask')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                className={`relative flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
                   activeMode === 'mask'
                     ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                     : 'text-text-3 hover:text-text-2'
@@ -272,10 +314,12 @@ export const DetectionSection: React.FC = () => {
             </svg>
 
             {/* FLOATING ANNOTATION PILL 1: Severe Pothole Label (.mk-label) */}
-            <div
+            <motion.div
               onClick={() => setSelectedDefect('pothole')}
-              className={`absolute top-[18%] right-[8%] md:right-[16%] transition-all duration-300 cursor-pointer ${
-                selectedDefect === 'pothole' ? 'scale-105 z-20' : 'hover:scale-102 z-10'
+              whileHover={{ scale: 1.03 }}
+              transition={{ duration: 0.18, ease: EASE_SWIFT }}
+              className={`absolute top-[18%] right-[8%] md:right-[16%] cursor-pointer ${
+                selectedDefect === 'pothole' ? 'scale-105 z-20' : 'z-10'
               }`}
             >
               <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-full bg-white text-[#0a0a0a] shadow-2xl border border-black/10">
@@ -292,44 +336,54 @@ export const DetectionSection: React.FC = () => {
               </div>
 
               {/* Expanded Inspection Card */}
-              {selectedDefect === 'pothole' && (
-                <div className="mt-2 p-3.5 rounded-xl bg-[#121212]/95 border border-line-2 shadow-2xl backdrop-blur-xl text-left w-64 animate-fade-in">
-                  <div className="flex items-center justify-between pb-2 border-b border-line mb-2.5">
-                    <span className="text-xs font-semibold text-text flex items-center gap-1.5">
-                      <AlertTriangle className="w-3.5 h-3.5 text-amber" />
-                      Critical Distress D40
-                    </span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber/15 text-amber">
-                      PCI: 18 / 100
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-[11px] text-text-3 font-mono">
-                    <div>
-                      <span className="block text-[10px] text-text-3/70 uppercase">Cavity Vol</span>
-                      <span className="text-text font-medium">0.12 m³</span>
+              <AnimatePresence>
+                {selectedDefect === 'pothole' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 6, scale: 0.96 }}
+                    transition={{ duration: 0.22, ease: EASE_SWIFT }}
+                    className="mt-2 p-3.5 rounded-xl bg-[#121212]/95 border border-line-2 shadow-2xl backdrop-blur-xl text-left w-64"
+                  >
+                    <div className="flex items-center justify-between pb-2 border-b border-line mb-2.5">
+                      <span className="text-xs font-semibold text-text flex items-center gap-1.5">
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber" />
+                        Critical Distress D40
+                      </span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber/15 text-amber">
+                        PCI: 18 / 100
+                      </span>
                     </div>
-                    <div>
-                      <span className="block text-[10px] text-text-3/70 uppercase">Max Depth</span>
-                      <span className="text-amber font-medium">72 mm</span>
+                    <div className="grid grid-cols-2 gap-2 text-[11px] text-text-3 font-mono">
+                      <div>
+                        <span className="block text-[10px] text-text-3/70 uppercase">Cavity Vol</span>
+                        <span className="text-text font-medium">0.12 m³</span>
+                      </div>
+                      <div>
+                        <span className="block text-[10px] text-text-3/70 uppercase">Max Depth</span>
+                        <span className="text-amber font-medium">72 mm</span>
+                      </div>
+                      <div>
+                        <span className="block text-[10px] text-text-3/70 uppercase">Classification</span>
+                        <span className="text-text font-medium">ASTM D6433</span>
+                      </div>
+                      <div>
+                        <span className="block text-[10px] text-text-3/70 uppercase">Priority</span>
+                        <span className="text-red-400 font-medium">Urgent (48h)</span>
+                      </div>
                     </div>
-                    <div>
-                      <span className="block text-[10px] text-text-3/70 uppercase">Classification</span>
-                      <span className="text-text font-medium">ASTM D6433</span>
-                    </div>
-                    <div>
-                      <span className="block text-[10px] text-text-3/70 uppercase">Priority</span>
-                      <span className="text-red-400 font-medium">Urgent (48h)</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
 
             {/* FLOATING ANNOTATION PILL 2: Crack Dimension Pill (.mk-dims) */}
-            <div
+            <motion.div
               onClick={() => setSelectedDefect('crack')}
-              className={`absolute top-[14%] left-[8%] md:left-[16%] transition-all duration-300 cursor-pointer ${
-                selectedDefect === 'crack' ? 'scale-105 z-20' : 'hover:scale-102 z-10'
+              whileHover={{ scale: 1.03 }}
+              transition={{ duration: 0.18, ease: EASE_SWIFT }}
+              className={`absolute top-[14%] left-[8%] md:left-[16%] cursor-pointer ${
+                selectedDefect === 'crack' ? 'scale-105 z-20' : 'z-10'
               }`}
             >
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-[#181818]/90 text-text border border-line-2 shadow-lg backdrop-blur-md">
@@ -343,18 +397,26 @@ export const DetectionSection: React.FC = () => {
               </div>
 
               {/* Expanded Inspection Card */}
-              {selectedDefect === 'crack' && (
-                <div className="mt-2 p-3 rounded-xl bg-[#121212]/95 border border-line-2 shadow-2xl backdrop-blur-xl text-left w-56 animate-fade-in">
-                  <div className="flex items-center justify-between pb-1.5 border-b border-line mb-2">
-                    <span className="text-xs font-semibold text-text">Class D20 Fatigue</span>
-                    <span className="text-[10px] font-mono text-emerald-400">94.2%</span>
-                  </div>
-                  <div className="text-[11px] text-text-2 leading-relaxed">
-                    Structural wheelpath fatigue failure. Interconnected polygons propagating along the asphalt binder.
-                  </div>
-                </div>
-              )}
-            </div>
+              <AnimatePresence>
+                {selectedDefect === 'crack' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 6, scale: 0.96 }}
+                    transition={{ duration: 0.22, ease: EASE_SWIFT }}
+                    className="mt-2 p-3 rounded-xl bg-[#121212]/95 border border-line-2 shadow-2xl backdrop-blur-xl text-left w-56"
+                  >
+                    <div className="flex items-center justify-between pb-1.5 border-b border-line mb-2">
+                      <span className="text-xs font-semibold text-text">Class D20 Fatigue</span>
+                      <span className="text-[10px] font-mono text-emerald-400">94.2%</span>
+                    </div>
+                    <div className="text-[11px] text-text-2 leading-relaxed">
+                      Structural wheelpath fatigue failure. Interconnected polygons propagating along the asphalt binder.
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
 
             {/* Bottom HUD Metadata Bar */}
             <div className="absolute bottom-3 inset-x-4 flex items-center justify-between text-[11px] font-mono text-text-3 bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-lg border border-line">
@@ -375,12 +437,23 @@ export const DetectionSection: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* 3-Column Sub-feature Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {/* 3-Column Sub-feature Grid with Staggered Entrance */}
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-5 text-left"
+        >
           {/* Card 1 */}
-          <div className="group p-6 md:p-7 rounded-card border border-line bg-surface shadow-card hover:border-line-2 transition-all">
+          <motion.div
+            variants={staggerItem}
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.2, ease: EASE_SWIFT }}
+            className="group p-6 md:p-7 rounded-card border border-line bg-surface shadow-card hover:border-line-2 transition-colors"
+          >
             <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-line-2 flex items-center justify-center text-text mb-5 group-hover:scale-105 transition-transform">
               <Target className="w-5 h-5 text-amber" />
             </div>
@@ -388,10 +461,15 @@ export const DetectionSection: React.FC = () => {
             <p className="text-sm text-text-2 leading-relaxed">
               Crop, box, and polygon masks generate on the fly. Bounding vectors snap tightly to damaged asphalt edges with sub-millimeter volume calculation.
             </p>
-          </div>
+          </motion.div>
 
           {/* Card 2 */}
-          <div className="group p-6 md:p-7 rounded-card border border-line bg-surface shadow-card hover:border-line-2 transition-all">
+          <motion.div
+            variants={staggerItem}
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.2, ease: EASE_SWIFT }}
+            className="group p-6 md:p-7 rounded-card border border-line bg-surface shadow-card hover:border-line-2 transition-colors"
+          >
             <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-line-2 flex items-center justify-center text-text mb-5 group-hover:scale-105 transition-transform">
               <Video className="w-5 h-5 text-amber" />
             </div>
@@ -399,10 +477,15 @@ export const DetectionSection: React.FC = () => {
             <p className="text-sm text-text-2 leading-relaxed">
               Ingest 4K dashcam streams, smartphone camera mounts, or georeferenced orthomosaic drone surveys with zero proprietary sensor locks.
             </p>
-          </div>
+          </motion.div>
 
           {/* Card 3 */}
-          <div className="group p-6 md:p-7 rounded-card border border-line bg-surface shadow-card hover:border-line-2 transition-all">
+          <motion.div
+            variants={staggerItem}
+            whileHover={{ y: -3 }}
+            transition={{ duration: 0.2, ease: EASE_SWIFT }}
+            className="group p-6 md:p-7 rounded-card border border-line bg-surface shadow-card hover:border-line-2 transition-colors"
+          >
             <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-line-2 flex items-center justify-center text-text mb-5 group-hover:scale-105 transition-transform">
               <Cpu className="w-5 h-5 text-amber" />
             </div>
@@ -412,9 +495,9 @@ export const DetectionSection: React.FC = () => {
             <p className="text-sm text-text-2 leading-relaxed">
               On-device YOLO vision model runs offline on Jetson, Ambarella, or mobile neural engines with zero cloud transmission overhead.
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 };
