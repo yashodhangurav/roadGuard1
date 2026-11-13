@@ -14,13 +14,13 @@ export const DetectionSection: React.FC = () => {
         <div className="max-w-[780px] mb-12 md:mb-16">
           <div className="step">
             <span className="step-n">01</span>
-            <span className="text-text font-medium">Detection</span>
+            <span className="text-text font-medium">Detect it</span>
           </div>
           <h2 className="text-[clamp(36px,5.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.045em] h2-gradient pb-2">
             RoadGuard AI spots what drivers miss
           </h2>
           <p className="mt-5 text-text-2 text-[clamp(17px,1.5vw,19px)] leading-[1.6]">
-            Detect potholes, cracks, surface deterioration and damaged road areas using computer vision. Process high-speed dashcam feeds, mobile camera frames, and drone aerials in real time — with zero human lag.
+            Automated pothole and road defect detection using real-time computer vision. Ingest high-speed dashcam feeds, mobile camera frames, and drone aerials to locate surface deterioration with millimeter precision — and zero human latency.
           </p>
         </div>
 

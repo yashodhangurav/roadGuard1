@@ -104,13 +104,13 @@ export const AnalysisSection: React.FC = () => {
         <div className="max-w-[780px] mb-12 md:mb-16">
           <div className="step">
             <span className="step-n">03</span>
-            <span className="text-text font-medium">Analysis</span>
+            <span className="text-text font-medium">Analyse it</span>
           </div>
           <h2 className="text-[clamp(36px,5.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.045em] h2-gradient pb-2">
             “Is that a puddle or a pothole?” Solved.
           </h2>
           <p className="mt-5 text-text-2 text-[clamp(17px,1.5vw,19px)] leading-[1.6]">
-            Show defect classification, confidence scores, severity and road condition analytics. Raw road video is full of shadows, wet asphalt reflections, and tire marks. RoadGuard AI strips optical noise, computes true crater depth, and turns chaotic imagery into audited engineering data.
+            Defect classification, severity ratings, and automated road condition analysis. Raw road video is full of shadows, wet reflections, and tire marks. RoadGuard AI strips optical noise, computes true crater depth in 3D, and turns chaotic imagery into audited ASTM D6433 engineering data.
           </p>
         </div>
 

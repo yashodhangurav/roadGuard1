@@ -83,13 +83,13 @@ export const MappingSection: React.FC = () => {
         <div className="max-w-[780px] mb-12 md:mb-16">
           <div className="step">
             <span className="step-n">02</span>
-            <span className="text-text font-medium">Mapping</span>
+            <span className="text-text font-medium">Map it</span>
           </div>
           <h2 className="text-[clamp(36px,5.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.045em] h2-gradient pb-2">
             Every defect pinned to the global grid
           </h2>
           <p className="mt-5 text-text-2 text-[clamp(17px,1.5vw,19px)] leading-[1.6]">
-            Display detected road defects on a geographical map with location and severity information. RoadGuard AI geo-tags every anomaly with sub-meter GNSS coordinates, clustering repairs onto GIS layers so road crews plan optimal routes.
+            Geographical visualisation of road defects across regional highway networks and municipal grids. RoadGuard AI geo-tags every anomaly with sub-meter GNSS coordinates, clustering repairs onto interactive GIS layers so road crews plan optimal paving routes.
           </p>
         </div>
 

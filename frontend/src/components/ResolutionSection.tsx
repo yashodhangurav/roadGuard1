@@ -65,13 +65,13 @@ export const ResolutionSection: React.FC = () => {
         <div className="max-w-[780px] mb-12 md:mb-16">
           <div className="step">
             <span className="step-n">04</span>
-            <span className="text-text font-medium">Resolution</span>
+            <span className="text-text font-medium">Resolve it</span>
           </div>
           <h2 className="text-[clamp(36px,5.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.045em] h2-gradient pb-2">
             Your road crews get the work order
           </h2>
           <p className="mt-5 text-text-2 text-[clamp(17px,1.5vw,19px)] leading-[1.6]">
-            Generate road inspection reports and prioritised maintenance recommendations. Dispatch repair plans directly into municipal GIS, work-order databases, or contractor mobile apps with exact coordinates, required asphalt volume, and photographic proof.
+            Maintenance prioritisation and automated inspection reporting. Dispatch repair schedules directly into municipal GIS, work-order databases, or contractor mobile apps with exact coordinates, required asphalt batch volume, and cryptographic photographic proof.
           </p>
         </div>
 
