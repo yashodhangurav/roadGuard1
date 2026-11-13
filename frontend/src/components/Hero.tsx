@@ -53,8 +53,8 @@ export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
       {/* Hero Copy Container */}
       <div className="wrap flex flex-col items-center text-center relative z-10">
         {/* Fluid Hero Title */}
-        <h1 className="hero-title text-[clamp(26px,6.8vw,104px)] font-normal leading-[1.05] sm:leading-[0.98] tracking-[-0.03em] sm:tracking-[-0.058em] hero-title-gradient pb-2 max-w-5xl">
-          Intelligent Road Monitoring.<br />
+        <h1 className="hero-title text-[clamp(28px,7.5vw,104px)] font-normal leading-[1.08] sm:leading-[0.98] tracking-[-0.03em] sm:tracking-[-0.058em] hero-title-gradient pb-2 max-w-5xl">
+          Intelligent Road<br className="sm:hidden" /> Monitoring.<br />
           Safer Roads.
         </h1>
 

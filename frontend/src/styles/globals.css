@@ -510,6 +510,26 @@
   }
 }
 
+/* Pen Loop Dashoffset Animation */
+@keyframes draw-loop {
+  0% {
+    stroke-dashoffset: 900;
+  }
+  45% {
+    stroke-dashoffset: 0;
+  }
+  80% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -900;
+  }
+}
+
+.animate-draw-loop {
+  animation: draw-loop 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
 /* Reduced Motion Override */
 @media (prefers-reduced-motion: reduce) {
   *,
