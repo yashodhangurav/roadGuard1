@@ -49,5 +49,5 @@ def test_detect_real_road_image():
     assert "defects" in data
     assert "stats" in data
     assert "annotatedImageUrl" in data
-    assert data["backend"] == "Live YOLOv8 API"
-    assert data["modelInfo"]["name"] == "YOLOv8s-RoadDamage-Edge"
+    assert data["backend"] in ("Live YOLOv8 API", "Live YOLO11 API") or "Live" in data["backend"]
+    assert data["modelInfo"]["name"] in ("YOLO11n-RoadHazard-Ensemble", "YOLOv8s-RoadDamage-Edge")

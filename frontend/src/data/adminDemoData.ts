@@ -54,6 +54,44 @@ export const DEMO_ADMIN_USER: AdminUser = {
   badgeNumber: 'DPW-8419',
 };
 
+export interface MunicipalStaffProfile {
+  id: string;
+  name: string;
+  role: 'Administrator' | 'Department Crew' | 'QA Inspector';
+  title: string;
+  department: string;
+  crew?: string;
+  badgeNumber: string;
+}
+
+export const MUNICIPAL_STAFF_PROFILES: MunicipalStaffProfile[] = [
+  {
+    id: 'ADM-2026-001',
+    name: 'Chief Engineer Sarah Lin',
+    role: 'Administrator',
+    title: 'Senior Municipal Infrastructure Supervisor',
+    department: 'Department of Public Works',
+    badgeNumber: 'DPW-8419',
+  },
+  {
+    id: 'CREW-2026-012',
+    name: 'Dave Miller',
+    role: 'Department Crew',
+    title: 'Repair Crew Field Supervisor',
+    department: 'Rapid Patch Division',
+    crew: 'Rapid Patch Unit #4',
+    badgeNumber: 'RPD-4102',
+  },
+  {
+    id: 'QA-2026-007',
+    name: 'Karen Davis',
+    role: 'QA Inspector',
+    title: 'Pavement Integrity & QA Inspector',
+    department: 'Quality Assurance Division',
+    badgeNumber: 'QA-7721',
+  },
+];
+
 export const INITIAL_NOTIFICATIONS: AdminNotification[] = [
   {
     id: 'NOTIF-01',

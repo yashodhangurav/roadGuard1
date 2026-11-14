@@ -9,9 +9,11 @@ from app.core.config import settings
 from app.api.router import api_router
 from app.services.yolo_service import yolo_service
 from app.database.session import init_db
+from app.database.mongodb import init_mongodb, check_mongo_health
 
-# Initialize database tables and canonical seeds on module load
+# Initialize database tables, MongoDB Atlas indexes and canonical seeds on module load
 init_db()
+init_mongodb()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -81,9 +83,11 @@ def health_check():
             "target_model": settings.OLLAMA_MODEL,
             "status": ollama_info,
             "ready": ollama_ok
-        }
+        },
+        "mongodb": check_mongo_health()
     }
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

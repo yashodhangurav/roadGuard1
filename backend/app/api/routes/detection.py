@@ -6,6 +6,8 @@ from datetime import datetime
 
 from app.core.config import settings
 from app.services.yolo_service import yolo_service
+from app.services.phash_service import phash_service
+from app.services.orb_service import orb_service
 from app.schemas.detection import DetectionResponse
 from app.database.session import get_db
 from app.database.models import InspectionReportORM, DefectItemORM
@@ -72,6 +74,10 @@ async def process_image_upload(
     # 5. Persist to SQLite Database
     if db is not None:
         try:
+            image_phash = phash_service.compute_phash(content)
+            kps, des, _ = orb_service.extract_features(content)
+            orb_service.save_features_cache(result.imageId, kps, des)
+
             report_orm = InspectionReportORM(
                 id=result.imageId,
                 file_name=result.fileName,
@@ -89,6 +95,8 @@ async def process_image_upload(
                 location_name=location_name or "Highway Route 101, MP 14.2",
                 latitude=latitude if latitude is not None else 37.7749,
                 longitude=longitude if longitude is not None else -122.4194,
+                image_phash=image_phash,
+                orb_keypoints_count=len(kps),
             )
             db.add(report_orm)
             db.flush()

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useReports, RoadDamageReport, ReportStatus } from '../../context/ReportsContext';
 import { ReportDetailModal } from './ReportDetailModal';
+import { OfflineSyncBanner } from './OfflineSyncBanner';
 
 interface MyReportsViewProps {
   onOpenReportModal: () => void;
@@ -80,6 +81,9 @@ export const MyReportsView: React.FC<MyReportsViewProps> = ({ onOpenReportModal 
         </div>
       </div>
 
+      {/* Offline Sync Status Hub */}
+      <OfflineSyncBanner />
+
       {/* Filter Tabs */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
         {FILTER_TABS.map((tab) => {
@@ -144,13 +148,18 @@ export const MyReportsView: React.FC<MyReportsViewProps> = ({ onOpenReportModal 
               <div className="flex items-start gap-4">
                 <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border border-white/15 bg-black shrink-0 relative">
                   <img
-                    src={report.imageUrl}
+                    src={report.annotatedImageUrl || report.imageUrl}
                     alt={report.category}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/80 text-[9px] font-mono text-white">
                     {report.severity}
                   </span>
+                  {report.aiDetection && (
+                    <span className="absolute top-1 right-1 px-1 py-0.2 rounded bg-[#d97757]/90 text-[8px] font-mono font-semibold text-white shadow-sm">
+                      AI
+                    </span>
+                  )}
                 </div>
 
                 <div className="space-y-1">
@@ -160,6 +169,28 @@ export const MyReportsView: React.FC<MyReportsViewProps> = ({ onOpenReportModal 
                     </span>
                     <span className="text-neutral-500 font-mono text-xs">·</span>
                     <span className="text-sm font-bold text-white">{report.category}</span>
+                    {report.aiConfidence && (
+                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.2 rounded">
+                        {report.aiConfidence.toFixed(0)}% AI
+                      </span>
+                    )}
+                    {report.syncStatus && (
+                      <span
+                        className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${
+                          report.syncStatus === 'SYNCED'
+                            ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                            : report.syncStatus === 'SYNCING'
+                            ? 'bg-blue-500/15 text-blue-300 border-blue-500/30 animate-pulse'
+                            : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                        }`}
+                      >
+                        {report.syncStatus === 'SYNCED'
+                          ? 'Atlas Synced'
+                          : report.syncStatus === 'SYNCING'
+                          ? 'Syncing...'
+                          : 'Offline Queue'}
+                      </span>
+                    )}
                   </div>
 
                   <p className="text-xs text-neutral-300 line-clamp-1 max-w-md">

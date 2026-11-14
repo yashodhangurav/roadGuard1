@@ -1,0 +1,19 @@
+{
+  "name": "RoadGuard AI — Municipal Road Damage Intelligence",
+  "short_name": "RoadGuard",
+  "description": "Offline-First Road Distress and Pothole Inspection Reporting System with Automated Background Synchronization",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07080b",
+  "theme_color": "#d97757",
+  "icons": [
+    {
+      "src": "/shield.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
+

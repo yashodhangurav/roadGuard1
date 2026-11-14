@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   FileText,
   Clock,
@@ -17,7 +18,9 @@ import { MonthlyTrendChart, CategoryPieChart } from '../../components/admin/Admi
 import { ReportsTable } from '../../components/admin/ReportsTable';
 import { ReportDetailsModal } from '../../components/admin/ReportDetailsModal';
 import { AdminMap } from '../../components/admin/AdminMap';
-import { AIDetectionView } from '../../components/admin/AIDetectionView';
+import { PendingReviewView } from '../../components/admin/PendingReviewView';
+import { DuplicateReviewView } from '../../components/admin/DuplicateReviewView';
+import { MaintainersView } from '../../components/admin/MaintainersView';
 import { AnalyticsView } from '../../components/admin/AnalyticsView';
 import { CitizensView } from '../../components/admin/CitizensView';
 import { SettingsView } from '../../components/admin/SettingsView';
@@ -38,7 +41,37 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   onBackToHome,
 }) => {
   const { reports, stats, updateReportStatus } = useReports();
-  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const getTabFromPath = (path: string): AdminTab => {
+    const segment = path.replace(/^\/admin\/?/, '').split('/')[0]?.toLowerCase();
+    if (segment === 'reports') return 'reports';
+    if (segment === 'pending') return 'pending';
+    if (segment === 'duplicates') return 'duplicates';
+    if (segment === 'maintainers') return 'maintainers';
+    if (segment === 'map') return 'map';
+    if (segment === 'analytics') return 'analytics';
+    if (segment === 'citizens') return 'citizens';
+    if (segment === 'settings') return 'settings';
+    return 'overview';
+  };
+
+  const activeTab = getTabFromPath(location.pathname);
+
+  const handleSelectTab = (tab: AdminTab) => {
+    setGlobalSearch('');
+    navigate(`/admin/${tab}`);
+  };
+
+  // Redirect legacy /admin/detection or /admin directly
+  useEffect(() => {
+    const segment = location.pathname.replace(/^\/admin\/?/, '').split('/')[0]?.toLowerCase();
+    if (segment === 'detection') {
+      navigate('/admin/pending', { replace: true });
+    }
+  }, [location.pathname, navigate]);
+
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
@@ -70,7 +103,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         onSearch={(query) => {
           setGlobalSearch(query);
           if (query && activeTab === 'overview') {
-            setActiveTab('reports');
+            handleSelectTab('reports');
           }
         }}
         onSelectReport={(id) => setSelectedReportId(id)}
@@ -80,10 +113,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       <div className="flex-1 flex w-full">
         <AdminSidebar
           activeTab={activeTab}
-          onSelectTab={(tab) => {
-            setActiveTab(tab);
-            setGlobalSearch('');
-          }}
+          onSelectTab={handleSelectTab}
           onBackToHome={onBackToHome}
           isMobileOpen={isMobileMenuOpen}
           onCloseMobile={() => setIsMobileMenuOpen(false)}
@@ -113,14 +143,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setActiveTab('pending')}
+                    onClick={() => handleSelectTab('pending')}
                     className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#d97757] hover:bg-[#c66848] text-white text-xs font-semibold shadow-md transition cursor-pointer"
                   >
                     <Clock className="w-3.5 h-3.5" />
                     <span>Review Pending ({stats.submitted})</span>
                   </button>
                   <button
-                    onClick={() => setActiveTab('map')}
+                    onClick={() => handleSelectTab('map')}
                     className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-medium transition cursor-pointer"
                   >
                     <span>View Damage Map</span>
@@ -183,7 +213,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       <span>Monthly Incident & Resolution Velocity</span>
                     </h3>
                     <button
-                      onClick={() => setActiveTab('analytics')}
+                      onClick={() => handleSelectTab('analytics')}
                       className="text-xs font-mono text-[#d97757] hover:underline"
                     >
                       Deep Analytics →
@@ -209,7 +239,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       Recent Road Incident Reports
                     </h3>
                     <button
-                      onClick={() => setActiveTab('reports')}
+                      onClick={() => handleSelectTab('reports')}
                       className="text-xs font-mono text-[#d97757] hover:underline"
                     >
                       View All Reports ({reports.length}) →
@@ -321,30 +351,26 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             </div>
           )}
 
-          {/* TAB 3: PENDING REVIEW */}
+          {/* TAB 3: PENDING REVIEW WITH AI DETECTION STUDIO */}
           {activeTab === 'pending' && (
-            <div className="space-y-4">
-              <div>
-                <h2 className="text-xl font-bold text-white tracking-tight">
-                  Pending Verification Queue
-                </h2>
-                <p className="text-xs text-neutral-400">
-                  New citizen submissions awaiting municipal inspection and severity classification.
-                </p>
-              </div>
-
-              <ReportsTable
-                onSelectReport={(id) => setSelectedReportId(id)}
-                initialStatus="Submitted"
-                searchQuery={globalSearch}
-                onQuickVerify={handleQuickVerify}
-                onQuickReject={handleQuickReject}
-              />
-            </div>
+            <PendingReviewView
+              onSelectReport={(id) => setSelectedReportId(id)}
+              searchQuery={globalSearch}
+            />
           )}
 
-          {/* TAB 4: AI DETECTION BENCHMARK */}
-          {activeTab === 'detection' && <AIDetectionView />}
+          {/* TAB 4: SUSPECTED DUPLICATE REVIEWS */}
+          {activeTab === 'duplicates' && (
+            <DuplicateReviewView
+              onSelectReport={(id) => setSelectedReportId(id)}
+              searchQuery={globalSearch}
+            />
+          )}
+
+          {/* TAB: MAINTAINER MANAGEMENT & DISPATCH */}
+          {activeTab === 'maintainers' && (
+            <MaintainersView onSelectReport={(id) => setSelectedReportId(id)} />
+          )}
 
           {/* TAB 5: ROAD DAMAGE MAP */}
           {activeTab === 'map' && (

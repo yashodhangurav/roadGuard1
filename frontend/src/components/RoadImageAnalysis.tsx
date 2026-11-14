@@ -16,6 +16,7 @@ import {
   Wrench,
   Gauge,
   Sparkles,
+  FileText,
 } from 'lucide-react';
 import {
   DetectionResult,
@@ -24,6 +25,7 @@ import {
   analyzeRoadImage,
   checkBackendHealth,
   downloadReportFile,
+  downloadInspectionPdf,
 } from '../services/detectionApi';
 
 interface RoadImageAnalysisProps {
@@ -45,6 +47,7 @@ export const RoadImageAnalysis: React.FC<RoadImageAnalysisProps> = ({
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [hasAnalyzed, setHasAnalyzed] = useState<boolean>(true); // default true to showcase model output immediately
   const [currentResult, setCurrentResult] = useState<DetectionResult | null>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
 
   // Interactive inspection state
   const [selectedDefectId, setSelectedDefectId] = useState<string | null>('DEF-101-01');
@@ -187,6 +190,23 @@ export const RoadImageAnalysis: React.FC<RoadImageAnalysisProps> = ({
     setHasAnalyzed(false);
     setSelectedDefectId(null);
     setHoveredDefectId(null);
+  };
+
+  // Download PDF Report Handler
+  const handleDownloadPdf = async () => {
+    if (!currentResult || isGeneratingPdf) return;
+    setIsGeneratingPdf(true);
+    try {
+      await downloadInspectionPdf(currentResult, {
+        address: 'Highway Route 101, San Francisco Sector 4B',
+        latitude: 37.774929,
+        longitude: -122.419416,
+      });
+    } catch (err) {
+      console.error('PDF generation error:', err);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   // Color helper for severities
@@ -676,16 +696,32 @@ export const RoadImageAnalysis: React.FC<RoadImageAnalysisProps> = ({
                 </button>
               </div>
 
-              {/* Download Report Button */}
+              {/* Download Report Buttons */}
               {hasAnalyzed && currentResult && (
-                <button
-                  type="button"
-                  onClick={() => downloadReportFile(currentResult)}
-                  className="w-full h-10 px-4 rounded-xl text-xs font-medium bg-[#14161f] hover:bg-[#1a1d29] text-white border border-white/15 transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
-                >
-                  <Download className="w-3.5 h-3.5 text-[#d97757]" />
-                  <span>Download ASTM D6433 Report (JSON)</span>
-                </button>
+                <div className="space-y-1.5">
+                  <button
+                    type="button"
+                    onClick={handleDownloadPdf}
+                    disabled={isGeneratingPdf}
+                    className="w-full h-11 px-4 rounded-xl text-xs font-semibold bg-[#d97757] hover:bg-[#c66848] text-white transition flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(217,119,87,0.35)] disabled:opacity-60"
+                  >
+                    <FileText className={`w-4 h-4 ${isGeneratingPdf ? 'animate-bounce' : ''}`} />
+                    <span>
+                      {isGeneratingPdf
+                        ? 'Generating ASTM D6433 PDF Report...'
+                        : 'Download Official Inspection Report (PDF)'}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => downloadReportFile(currentResult)}
+                    className="w-full h-9 px-4 rounded-xl text-[11px] font-mono font-medium bg-[#14161f] hover:bg-[#1a1d29] text-neutral-300 hover:text-white border border-white/10 transition flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5 text-[#d97757]" />
+                    <span>Export Telemetry & Damage Log (JSON)</span>
+                  </button>
+                </div>
               )}
             </div>
           </div>

@@ -3,13 +3,14 @@ import {
   LayoutDashboard,
   FileText,
   Clock,
-  Scan,
   Map,
   BarChart3,
   Users,
   Settings,
   ArrowLeft,
   X,
+  Layers,
+  HardHat,
 } from 'lucide-react';
 import { useReports } from '../../context/ReportsContext';
 
@@ -17,7 +18,8 @@ export type AdminTab =
   | 'overview'
   | 'reports'
   | 'pending'
-  | 'detection'
+  | 'duplicates'
+  | 'maintainers'
   | 'map'
   | 'analytics'
   | 'citizens'
@@ -38,7 +40,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   isMobileOpen = false,
   onCloseMobile,
 }) => {
-  const { reports, stats } = useReports();
+  const { reports, stats, duplicateReviewCount } = useReports();
 
   const NAV_ITEMS: {
     id: AdminTab;
@@ -56,7 +58,18 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       count: stats.submitted + stats.underReview,
       badgeColor: 'bg-[#d97757] text-white',
     },
-    { id: 'detection', label: 'AI Detection', icon: Scan },
+    {
+      id: 'duplicates',
+      label: 'Duplicate Reviews',
+      icon: Layers,
+      count: duplicateReviewCount,
+      badgeColor: 'bg-amber-500 text-black font-semibold',
+    },
+    {
+      id: 'maintainers',
+      label: 'Maintainer Ops',
+      icon: HardHat,
+    },
     { id: 'map', label: 'Road Damage Map', icon: Map },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'citizens', label: 'Citizen Directory', icon: Users },

@@ -18,6 +18,9 @@ import { AdminLogin } from './pages/admin/AdminLogin';
 import { AdminPortal } from './pages/admin/AdminPortal';
 import { getStoredAdminUser } from './services/adminService';
 import { AdminUser } from './data/adminDemoData';
+import { MaintainerLogin } from './pages/maintainer/MaintainerLogin';
+import { MaintainerPortal } from './pages/maintainer/MaintainerPortal';
+import { getStoredMaintainer, Maintainer } from './services/maintainerService';
 
 const AdminRouteWrapper: React.FC = () => {
   const [adminUser, setAdminUser] = useState<AdminUser | null>(() => getStoredAdminUser());
@@ -54,6 +57,47 @@ const AdminLoginWrapper: React.FC = () => {
       onLoginSuccess={(user) => {
         setAdminUser(user);
         navigate('/admin/dashboard');
+      }}
+      onBackToHome={() => navigate('/')}
+    />
+  );
+};
+
+const MaintainerRouteWrapper: React.FC = () => {
+  const [maintainerUser, setMaintainerUser] = useState<Maintainer | null>(() => getStoredMaintainer());
+  const navigate = useNavigate();
+
+  if (!maintainerUser) {
+    return <Navigate to="/maintainer/login" replace />;
+  }
+
+  return (
+    <MaintainerPortal
+      maintainerUser={maintainerUser}
+      onLogout={() => {
+        setMaintainerUser(null);
+        navigate('/maintainer/login');
+      }}
+      onBackToHome={() => {
+        navigate('/');
+      }}
+    />
+  );
+};
+
+const MaintainerLoginWrapper: React.FC = () => {
+  const [maintainerUser, setMaintainerUser] = useState<Maintainer | null>(() => getStoredMaintainer());
+  const navigate = useNavigate();
+
+  if (maintainerUser) {
+    return <Navigate to="/maintainer/portal" replace />;
+  }
+
+  return (
+    <MaintainerLogin
+      onLoginSuccess={(user) => {
+        setMaintainerUser(user);
+        navigate('/maintainer/portal');
       }}
       onBackToHome={() => navigate('/')}
     />
@@ -155,6 +199,11 @@ export const App: React.FC = () => {
             <Route path="/admin/login" element={<AdminLoginWrapper />} />
             <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="/admin/*" element={<AdminRouteWrapper />} />
+
+            {/* Maintainer Field Operations Routes */}
+            <Route path="/maintainer/login" element={<MaintainerLoginWrapper />} />
+            <Route path="/maintainer" element={<Navigate to="/maintainer/portal" replace />} />
+            <Route path="/maintainer/*" element={<MaintainerRouteWrapper />} />
 
             {/* Catch-all redirect to Home */}
             <Route path="*" element={<Navigate to="/" replace />} />

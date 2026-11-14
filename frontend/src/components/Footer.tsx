@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Github, ArrowUpRight } from 'lucide-react';
+import { Shield, Github, ArrowUpRight, HardHat } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const Footer: React.FC = () => {
@@ -98,6 +98,15 @@ export const Footer: React.FC = () => {
                 >
                   <Shield className="w-3.5 h-3.5 text-amber" />
                   <span>Administrator Portal</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/maintainer/login"
+                  className="hover:text-[#d97757] transition-colors flex items-center gap-1.5 text-text-2 font-medium"
+                >
+                  <HardHat className="w-3.5 h-3.5 text-[#d97757]" />
+                  <span>Maintainer Field Portal</span>
                 </Link>
               </li>
               <li>

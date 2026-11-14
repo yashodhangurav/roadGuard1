@@ -82,6 +82,21 @@ export interface RoadSamplePreset {
   stats: RoadDamageStats;
 }
 
+/**
+ * Helper to convert a Base64 data URL to a standard browser File object.
+ */
+export function dataURLtoFile(dataurl: string, filename: string = 'capture.jpg'): File {
+  const arr = dataurl.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+}
+
 export const ROAD_PRESETS: RoadSamplePreset[] = [
   {
     id: 'preset-pothole',
@@ -278,14 +293,14 @@ export async function checkBackendHealth(
  * demo simulation engine when the local backend server is offline.
  */
 export async function analyzeRoadImage(
-  input: File | string,
+  input: File | Blob | string,
   presetId?: string,
   customApiUrl: string = DEFAULT_API_ENDPOINT
 ): Promise<DetectionResult> {
   const startTime = performance.now();
 
   // If input is a preset identifier and not a custom file, check if we have predefined calibrated detections
-  if (typeof input === 'string') {
+  if (typeof input === 'string' && !input.startsWith('data:image/')) {
     const foundPreset = ROAD_PRESETS.find((p) => p.id === presetId || p.imageUrl === input);
     if (foundPreset) {
       // Simulate real-time inference latency (450ms - 750ms) for realistic UX
@@ -309,10 +324,36 @@ export async function analyzeRoadImage(
     }
   }
 
-  // If input is a real File uploaded by user, attempt backend API first
+  // Convert Base64 data URL, image URL, or generic Blob to standard File
+  let targetFile: File | null = null;
   if (input instanceof File) {
+    targetFile = input;
+  } else if (input instanceof Blob) {
+    targetFile = new File([input], `photo-${Date.now()}.jpg`, { type: input.type || 'image/jpeg' });
+  } else if (typeof input === 'string') {
+    if (input.startsWith('data:image/')) {
+      targetFile = dataURLtoFile(input, `capture-${Date.now()}.jpg`);
+    } else {
+      try {
+        const resolvedUrl = input.startsWith('/outputs') || input.startsWith('/api')
+          ? `http://localhost:8000${input}`
+          : input;
+        const fetchRes = await fetch(resolvedUrl);
+        if (fetchRes.ok) {
+          const blob = await fetchRes.blob();
+          const fname = input.split('/').pop()?.split('?')[0] || `image-${Date.now()}.jpg`;
+          targetFile = new File([blob], fname, { type: blob.type || 'image/jpeg' });
+        }
+      } catch (fetchErr) {
+        console.warn('Could not fetch input URL as File for backend inference:', fetchErr);
+      }
+    }
+  }
+
+  // If we have a file, attempt backend API first
+  if (targetFile) {
     const formData = new FormData();
-    formData.append('file', input);
+    formData.append('file', targetFile);
 
     try {
       const controller = new AbortController();
@@ -333,13 +374,31 @@ export async function analyzeRoadImage(
           ? (data.annotatedImageUrl.startsWith('http') ? data.annotatedImageUrl : `${backendOrigin}${data.annotatedImageUrl}`)
           : undefined;
 
+        const displayUrl = typeof input === 'string'
+          ? input
+          : targetFile ? URL.createObjectURL(targetFile) : '';
+
         return {
           imageId: data.imageId || `UPLOAD-${Date.now().toString(36).toUpperCase()}`,
-          fileName: input.name,
-          imageUrl: URL.createObjectURL(input),
+          fileName: targetFile.name,
+          imageUrl: displayUrl,
           annotatedImageUrl: fullAnnotatedUrl,
           analyzedAt: data.analyzedAt || new Date().toISOString(),
-          defects: data.defects || [],
+          defects: (data.defects || []).map((d: any) => ({
+            id: d.id,
+            type: d.type,
+            severity: d.severity,
+            confidence: d.confidence,
+            box: d.box,
+            dimensions: d.dimensions || {
+              widthCm: 56,
+              heightCm: 44,
+              estimatedDepthMm: 68,
+              areaCm2: 2464,
+            },
+            urgency: d.urgency || (d.severity === 'Critical' ? 'Immediate' : 'Priority (48h)'),
+            repairMethod: d.repairMethod || 'Hot-mix asphalt patch and roller compaction',
+          })),
           stats: data.stats || {
             totalDefects: data.defects?.length || 0,
             potholesCount: data.defects?.filter((d: any) => d.type === 'Pothole').length || 0,
@@ -355,8 +414,8 @@ export async function analyzeRoadImage(
           backend: 'Live API',
           backendEndpoint: customApiUrl,
           modelInfo: {
-            name: data.modelInfo?.name || 'YOLOv8s-RoadDamage-Edge',
-            version: data.modelInfo?.version || 'v1.0.0-verified',
+            name: data.modelInfo?.name || 'YOLOv11-RoadHazard-Ensemble',
+            version: data.modelInfo?.version || 'v2.0.0-dual-engine',
             inferenceTimeMs: data.modelInfo?.inferenceTimeMs || duration,
           },
         };
@@ -364,86 +423,70 @@ export async function analyzeRoadImage(
     } catch (err) {
       console.warn("Backend API request error, falling back to simulated engine:", err);
     }
-
-    // Fallback: Generate calibrated detection for custom uploaded file
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    const duration = Math.round(performance.now() - startTime);
-    const objectUrl = URL.createObjectURL(input);
-
-    return {
-      imageId: `UPLOAD-${Date.now().toString(36).toUpperCase()}`,
-      fileName: input.name,
-      imageUrl: objectUrl,
-      analyzedAt: new Date().toISOString(),
-      defects: [
-        {
-          id: 'DEF-UP-01',
-          type: 'Pothole',
-          severity: 'High',
-          confidence: 96.2,
-          box: { x: 36, y: 42, width: 28, height: 30 },
-          dimensions: {
-            widthCm: 56,
-            heightCm: 44,
-            estimatedDepthMm: 68,
-            areaCm2: 2464,
-          },
-          urgency: 'Priority (48h)',
-          repairMethod: 'Milling, tack coat application and dense-graded hot mix asphalt fill',
-        },
-        {
-          id: 'DEF-UP-02',
-          type: 'Longitudinal Crack',
-          severity: 'Medium',
-          confidence: 88.9,
-          box: { x: 22, y: 26, width: 18, height: 48 },
-          dimensions: {
-            widthCm: 145,
-            heightCm: 16,
-            estimatedDepthMm: 18,
-            areaCm2: 2320,
-          },
-          urgency: 'Routine',
-          repairMethod: 'Compressed air cleaning and hot-applied polymer bitumen sealant',
-        },
-      ],
-      stats: {
-        totalDefects: 2,
-        potholesCount: 1,
-        cracksCount: 1,
-        deteriorationCount: 0,
-        criticalCount: 0,
-        overallCondition: 'Poor',
-        hazardIndex: 72,
-        pciScore: 58,
-        estimatedPatchTons: 1.15,
-        scanDurationMs: duration,
-      },
-      backend: 'Demo Engine',
-      backendEndpoint: customApiUrl,
-      modelInfo: {
-        name: 'YOLOv11-RoadDefect-RT',
-        version: 'v4.2.0-client-engine',
-        inferenceTimeMs: duration,
-      },
-    };
   }
 
-  // Fallback preset
-  const defaultPreset = ROAD_PRESETS[0];
+  // Fallback: Generate calibrated detection for custom uploaded file
+  await new Promise((resolve) => setTimeout(resolve, 800));
+  const duration = Math.round(performance.now() - startTime);
+  const objectUrl = typeof input === 'string'
+    ? input
+    : targetFile ? URL.createObjectURL(targetFile) : '';
+
   return {
-    imageId: defaultPreset.id,
-    fileName: `${defaultPreset.id}.jpg`,
-    imageUrl: defaultPreset.imageUrl,
+    imageId: `UPLOAD-${Date.now().toString(36).toUpperCase()}`,
+    fileName: targetFile?.name || 'custom_upload.jpg',
+    imageUrl: objectUrl,
     analyzedAt: new Date().toISOString(),
-    defects: defaultPreset.defects,
-    stats: defaultPreset.stats,
+    defects: [
+      {
+        id: 'DEF-UP-01',
+        type: 'Pothole',
+        severity: 'High',
+        confidence: 96.2,
+        box: { x: 36, y: 42, width: 28, height: 30 },
+        dimensions: {
+          widthCm: 56,
+          heightCm: 44,
+          estimatedDepthMm: 68,
+          areaCm2: 2464,
+        },
+        urgency: 'Priority (48h)',
+        repairMethod: 'Milling, tack coat application and dense-graded hot mix asphalt fill',
+      },
+      {
+        id: 'DEF-UP-02',
+        type: 'Longitudinal Crack',
+        severity: 'Medium',
+        confidence: 88.9,
+        box: { x: 22, y: 26, width: 18, height: 48 },
+        dimensions: {
+          widthCm: 145,
+          heightCm: 16,
+          estimatedDepthMm: 18,
+          areaCm2: 2320,
+        },
+        urgency: 'Routine',
+        repairMethod: 'Compressed air cleaning and hot-applied polymer bitumen sealant',
+      },
+    ],
+    stats: {
+      totalDefects: 2,
+      potholesCount: 1,
+      cracksCount: 1,
+      deteriorationCount: 0,
+      criticalCount: 0,
+      overallCondition: 'Poor',
+      hazardIndex: 72,
+      pciScore: 58,
+      estimatedPatchTons: 1.15,
+      scanDurationMs: duration,
+    },
     backend: 'Demo Engine',
     backendEndpoint: customApiUrl,
     modelInfo: {
       name: 'YOLOv11-RoadDefect-RT',
-      version: 'v4.2.0-fp16',
-      inferenceTimeMs: 44,
+      version: 'v4.2.0-client-engine',
+      inferenceTimeMs: duration,
     },
   };
 }
@@ -515,3 +558,398 @@ export function downloadReportFile(result: DetectionResult): void {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+
+// Re-export PDF report generator functions
+export { downloadInspectionPdf, generateRoadInspectionPdf } from './pdfReportGenerator';
+
+export interface NearbyReport {
+  id: string;
+  client_report_id?: string;
+  category: string;
+  severity: 'Low' | 'Medium' | 'High' | 'Critical';
+  status: string;
+  description?: string;
+  latitude: number;
+  longitude: number;
+  address?: string;
+  distance_meters: number;
+  image_url?: string;
+  annotated_image_url?: string;
+  image_phash?: string;
+  submitted_at?: string;
+  pci_score?: number;
+  total_defects?: number;
+}
+
+export interface OrbMatchingMetrics {
+  query_keypoints_count: number;
+  train_keypoints_count: number;
+  good_matches_count: number;
+  ransac_inliers_count: number;
+  inlier_ratio: number;
+  has_homography: boolean;
+  match_verdict: string;
+  similarity_score: number;
+}
+
+export interface DuplicateCandidate {
+  report_id: string;
+  client_report_id?: string;
+  canonical_issue_id?: string;
+  distance: number;
+  similarity_score: number;
+  match_level: string;
+  match_type?: 'PHASH' | 'PHASH_IDENTICAL' | 'ORB_VIEWPOINT' | 'COMBINED' | 'PROBABLE_ORB' | 'VISUAL_RESEMBLANCE' | 'NONE';
+  match_reason?: string;
+  verdict?: 'CONFIRMED_DUPLICATE' | 'NEEDS_REVIEW' | 'NEW_ISSUE';
+  confidence_tier?: 'HIGH' | 'MODERATE' | 'LOW';
+  evidence_score?: number;
+  is_candidate_duplicate: boolean;
+  category: string;
+  severity: string;
+  status: string;
+  distance_meters?: number;
+  address?: string;
+  image_url?: string;
+  annotated_image_url?: string;
+  submitted_at?: string;
+  orb_metrics?: OrbMatchingMetrics;
+}
+
+export interface CheckDuplicateResponse {
+  query_phash: string;
+  orb_keypoints_detected: number;
+  search_radius_meters: number;
+  total_nearby_evaluated: number;
+  has_duplicate_candidate: boolean;
+  overall_verdict?: 'CONFIRMED_DUPLICATE' | 'NEEDS_REVIEW' | 'NEW_ISSUE';
+  duplicate_candidates: DuplicateCandidate[];
+}
+
+export interface NearbyReportsResponse {
+  center: { latitude: number; longitude: number };
+  radius_meters: number;
+  total_found: number;
+  reports: NearbyReport[];
+}
+
+export function calculateHaversineDistanceMeters(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const R = 6371000; // meters
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c * 10) / 10;
+}
+
+function getLocalNearbyReportsFallback(
+  latitude: number,
+  longitude: number,
+  radiusMeters: number
+): NearbyReportsResponse {
+  try {
+    const raw = localStorage.getItem('roadguard_citizen_reports');
+    if (raw) {
+      const reports = JSON.parse(raw);
+      if (Array.isArray(reports)) {
+        const matches: NearbyReport[] = [];
+        for (const r of reports) {
+          const lat = r.location?.latitude;
+          const lng = r.location?.longitude;
+          if (lat != null && lng != null) {
+            const dist = calculateHaversineDistanceMeters(latitude, longitude, lat, lng);
+            if (dist <= radiusMeters) {
+              matches.push({
+                id: r.id,
+                client_report_id: r.clientReportId || r.id,
+                category: r.category || 'Pothole',
+                severity: r.severity || 'High',
+                status: r.status || 'Submitted',
+                description: r.description || '',
+                latitude: lat,
+                longitude: lng,
+                address: r.location?.address || `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+                distance_meters: dist,
+                image_url: r.imageUrl || '',
+                annotated_image_url: r.annotatedImageUrl || '',
+                submitted_at: r.submittedAt || '',
+                total_defects: 1,
+              });
+            }
+          }
+        }
+        matches.sort((a, b) => a.distance_meters - b.distance_meters);
+        return {
+          center: { latitude, longitude },
+          radius_meters: radiusMeters,
+          total_found: matches.length,
+          reports: matches,
+        };
+      }
+    }
+  } catch {}
+
+  return {
+    center: { latitude, longitude },
+    radius_meters: radiusMeters,
+    total_found: 0,
+    reports: [],
+  };
+}
+
+export async function fetchNearbyReports(
+  latitude: number,
+  longitude: number,
+  radiusMeters: number = 50,
+  limit: number = 20
+): Promise<NearbyReportsResponse> {
+  try {
+    const res = await fetch(
+      `http://127.0.0.1:8000/api/reports/nearby?latitude=${latitude}&longitude=${longitude}&radius_meters=${radiusMeters}&limit=${limit}`
+    );
+    if (res.ok) {
+      const data = await res.json();
+      return data;
+    }
+  } catch (err) {
+    console.warn('Backend nearby search unreachable, falling back to local search:', err);
+  }
+
+  // Graceful offline/local fallback
+  return getLocalNearbyReportsFallback(latitude, longitude, radiusMeters);
+}
+
+/**
+ * Perform a perceptual hash (pHash) duplicate check against nearby existing reports.
+ */
+export async function checkDuplicateImage(
+  imageBlobOrFile: Blob | File,
+  latitude: number,
+  longitude: number,
+  radiusMeters: number = 50,
+  category?: string
+): Promise<CheckDuplicateResponse | null> {
+  try {
+    const formData = new FormData();
+    formData.append('image', imageBlobOrFile, 'query.jpg');
+    formData.append('latitude', String(latitude));
+    formData.append('longitude', String(longitude));
+    formData.append('radius_meters', String(radiusMeters));
+    if (category) {
+      formData.append('category', category);
+    }
+
+    const res = await fetch('http://127.0.0.1:8000/api/reports/check-duplicate', {
+      method: 'POST',
+      body: formData,
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn('Check duplicate API unreachable:', err);
+  }
+  return null;
+}
+
+/**
+ * Fetch reports whose duplicate status is uncertain and awaiting admin verification.
+ */
+export async function fetchPendingDuplicateReviews(): Promise<any[]> {
+  try {
+    const res = await fetch('http://127.0.0.1:8000/api/reports/duplicates/pending-review');
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn('Error fetching pending duplicate reviews:', err);
+  }
+  return [];
+}
+
+/**
+ * Fetch all citizen reports linked to a canonical ticket.
+ */
+export async function fetchDuplicateCluster(reportId: string): Promise<any | null> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/reports/${reportId}/duplicate-cluster`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn(`Error fetching duplicate cluster for ${reportId}:`, err);
+  }
+  return null;
+}
+
+/**
+ * Submit an admin decision for a pending duplicate report.
+ */
+export async function reviewDuplicateReport(
+  reportId: string,
+  action: 'CONFIRM_DUPLICATE' | 'DISMISS_DUPLICATE',
+  canonicalIssueId?: string,
+  adminNotes?: string
+): Promise<any | null> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/reports/${reportId}/duplicate-review`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action,
+        canonical_issue_id: canonicalIssueId,
+        admin_notes: adminNotes,
+      }),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn(`Error reviewing duplicate report ${reportId}:`, err);
+  }
+  return null;
+}
+
+// -------------------------------------------------------------
+// 8-Stage Progress Monitoring & Repair Management API Methods
+// -------------------------------------------------------------
+
+export interface ProgressStagePayload {
+  stage: string;
+  actor_name: string;
+  actor_role: string;
+  department?: string;
+  crew?: string;
+  expected_completion_date?: string;
+  notes?: string;
+  reopen_reason?: string;
+}
+
+export interface ProgressPhotoRecord {
+  url: string;
+  stage: 'before' | 'during' | 'after';
+  caption?: string;
+  actor_name?: string;
+  actor_role?: string;
+  department?: string;
+  uploaded_at?: string;
+}
+
+export interface ProgressHistoryEntry {
+  id: string;
+  stage: string;
+  status: string;
+  timestamp: string;
+  actor_name: string;
+  actor_role: string;
+  department?: string;
+  crew?: string;
+  expected_completion_date?: string;
+  notes?: string;
+  reopen_reason?: string;
+  photos: ProgressPhotoRecord[];
+}
+
+export interface ReportProgressResponse {
+  success: boolean;
+  report_id: string;
+  current_stage: string;
+  status: string;
+  assigned_department?: string;
+  assigned_crew?: string;
+  expected_completion_date?: string;
+  reopened_count: number;
+  reopened_reason?: string;
+  before_images: string[];
+  during_images: string[];
+  after_images: string[];
+  repair_progress_history: ProgressHistoryEntry[];
+  linked_duplicates_count: number;
+  message: string;
+}
+
+/**
+ * Fetch full 8-stage progress state, expected completion date, before/during/after images,
+ * and repair audit history for a canonical report.
+ */
+export async function fetchReportProgress(reportId: string): Promise<ReportProgressResponse | null> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/reports/${reportId}/progress`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn(`Error fetching progress for report ${reportId}:`, err);
+  }
+  return null;
+}
+
+/**
+ * Advance or transition the repair lifecycle stage.
+ */
+export async function updateReportProgressStage(
+  reportId: string,
+  payload: ProgressStagePayload
+): Promise<ReportProgressResponse | null> {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/reports/${reportId}/progress-stage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn(`Error updating progress stage for report ${reportId}:`, err);
+  }
+  return null;
+}
+
+/**
+ * Upload a progress photograph ('before', 'during', or 'after') by an authorised department user or inspector.
+ */
+export async function uploadRepairPhoto(
+  reportId: string,
+  photo: File | Blob,
+  stage: 'before' | 'during' | 'after',
+  caption?: string,
+  actorName: string = 'Authorized Department User',
+  actorRole: string = 'Department Crew',
+  department?: string
+): Promise<{ success: boolean; photo_url: string; stage: string; message: string } | null> {
+  try {
+    const formData = new FormData();
+    formData.append('photo', photo, `repair_${stage}_${Date.now()}.jpg`);
+    formData.append('stage', stage);
+    if (caption) formData.append('caption', caption);
+    formData.append('actor_name', actorName);
+    formData.append('actor_role', actorRole);
+    if (department) formData.append('department', department);
+
+    const res = await fetch(`http://127.0.0.1:8000/api/reports/${reportId}/repair-photo`, {
+      method: 'POST',
+      body: formData,
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn(`Error uploading repair photo for report ${reportId}:`, err);
+  }
+  return null;
+}
+
+
+
+
